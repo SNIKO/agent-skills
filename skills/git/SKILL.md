@@ -1,6 +1,6 @@
 ---
 name: git
-description: Use when user asks for git operations: branch creation, committing changes, creating pull requests.
+description: "Use when user asks for git operations: branch creation, committing changes, creating pull requests."
 ---
 
 <constraints>
