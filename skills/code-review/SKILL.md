@@ -25,7 +25,6 @@ Check the following sources in order:
    - Conversation context and user messages
    - If PR: read PR title and description for intent, linked workitems, and acceptance criteria
    - If branch: look for branch name, commit messages
-   - If workitem found (WI\d+, can be in PR title or description, branch name): load workitem details via ediprod MCP/cli tools
 
 ## 2. Summarize
    
