@@ -1,95 +1,25 @@
 ---
 name: prompt-writer
-description: "Apply when editing/creating prompts, system prompts, agent instructions, or skill files, everything that is consumed by LLMs and AI agents."
+description: "Use when creating, reviewing, or revising prompts, system prompts, developer instructions, agent policies, prompt templates, eval prompts, or skill files consumed by LLMs and AI agents. Routes to OpenAI, Anthropic/Claude, or generic prompt-writing guidance based on the target model/provider."
 ---
 
 # Prompt Writer
 
-Goal: max signal, min tokens. Use empirically-tested prompt engineering principles.
+Use this skill as a router. Do not rely on this file for detailed prompting rules; load the appropriate reference before writing, reviewing, or revising the prompt.
 
-## Rules
+## Provider Selection
 
-### Format Hierarchy
+Infer the target provider from the user request, model names, product names, surrounding prompt context, or prompt target:
 
-Mix formats for maximum token-efficiency and clarity:
+- **OpenAI**: GPT, GPT-5.x, OpenAI, ChatGPT, Codex. Read [references/openai.md](references/openai.md).
+- **Anthropic/Claude**: Claude, Anthropic, Opus, Sonnet, Haiku. Read [references/anthropic.md](references/anthropic.md).
+- **Unknown, provider-neutral, mixed, or generic prompts**: read [references/generic.md](references/generic.md).
 
-- **XML tags** - for structural boundaries (`<instructions>`, `<context>`, `<examples>`)
-- **Yaml or key-value pairs** - for configs, variables, definitions
-- **JSON** - for output schemas
-- **Markdown** - for everything else (instructions, context)
+If more than one provider applies, read each relevant provider reference and resolve conflicts in favor of the user's stated target. If no target is stated, use the generic reference.
 
-### Kill the Hedge Tax
+## Required Workflow
 
-Hedge phrases (`if possible`, `please try to`, `where appropriate`) dilute attention and waste tokens. Be direct and specific.
-
-Three-Primitives compression:
-1. Extract **Task + Format**
-2. Extract **Minimum Viable Context**
-3. Convert all rules to **declarative assertions**
-
-<example type="bad">
-   Please make sure the response is not too long and stays professional and avoids jargon that non-technical users might not understand.
-   Return only valid JSON if possible and avoid adding extra commentary.
-</example>
-
-<example type="good">
-   Max 200 words. Grade-8 reading level. No technical jargon.
-   Output: valid JSON only. No prose. No commentary.
-</example>
-
-### Affirmative Blueprint + Late Fences
-
-Negative constraints echo the prohibited concept into output.
-
-<example type="bad">
-   Don't exceed 4 columns. Don't add meta-commentary.
-</example>
-
-<example type="good" >
-   Create a 4-column table: Option, Pros, Cons, Verdict. No other columns.
-</example>
-
-### Persona + Goal + Anti-Goal
-
-<example type="bad">
-   You are an expert editor.
-</example>
-
-<example type="good">
-   Role: Sharp developmental editor at a top literary agency.
-   Goal: Surface structural weaknesses in the argument.
-   Anti-goal: Do NOT rewrite sentences — surface issues only, don't fix them.
-</example>
-
-<example type="bad">
-   act like a database expert
-</example>
-
-<example type="good">
-   Senior DBA at Stripe, 15 years Postgres, skeptical of ORMs
-</example>
-
-**Specificity rule:** every detail must be *causal* to the task. Generic roles average the output. Decorative details add noise. Test: if removing it wouldn't change the answer, it's decoration.
-
-### Interface Prompt, Not Narrative
-
-<example type="bad">
-   You are a helpful assistant that tries to be concise and always explains your reasoning before giving an answer.
-</example>
-
-<example type="good">
-   Role: Summarizer
-   Goal: <=150 words
-   Constraints:
-   - No introductions
-   - No repetition
-   - Preserve technical terms
-   Output: plain text
-</example>
-
-
-### Static-Top, Dynamic-Bottom
-
-For prompt caching:
-- **Top**: all static content — system instructions, tool schemas, fixed config
-- **Bottom**: all dynamic content — user queries, injectable context, injectable variables
+1. Select and read the proper reference file before producing the prompt artifact.
+2. Follow the selected reference's structure, rules, examples, output rules, and quality check.
+3. Keep the user's intended behavior unless it conflicts with the user's current request or the selected reference.
+4. Return the finished prompt first, with a short note only when it helps explain an important structure choice.
