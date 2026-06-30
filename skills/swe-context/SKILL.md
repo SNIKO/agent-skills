@@ -9,13 +9,13 @@ Create a concise, evidence-based context package that enables later design and
 planning without repeating initial repository and external-system discovery.
 </goal>
 
-<anti-goals>
+<anti-goal>
 - Do not decide architecture or choose an implementation approach.
 - Do not create implementation tasks.
 - Do not modify product requirements.
 - Do not begin implementation.
 - Do not collect unrelated repository information.
-</anti-goals>
+</anti-goal>
 
 <variables>
 WORK_DIR: `.swe-work/`
