@@ -1,9 +1,15 @@
 # <Change title> — Context
 
-Status: Current  
 Collected: YYYY-MM-DD  
 Repository revision: <git SHA if available>
 External sources verified: YYYY-MM-DD  
+
+## Context digest
+
+- Relevant areas: ...
+- Existing pattern to follow: ...
+- Constraints that affect design: ...
+- Open risks or unknowns: ...
 
 ## Repository index
 

@@ -20,7 +20,7 @@ planning without repeating initial repository and external-system discovery.
 <variables>
 WORK_DIR: `.swe-work/`
 CHANGE_DIR: infer from user input (e.g. `.swe-work/{{DATE}}-{{SLUG}}/`)
-REQUIREMENTS_FILE: infer from user input (e.g. `{CHANGE_DIR}/01-requirements.md`)
+PROPOSAL_FILE: infer from user input (e.g. `{CHANGE_DIR}/01-proposal.md`)
 CONTEXT_FILE: `{CHANGE_DIR}/02-context.md`
 REFERENCES_DIR: `{CHANGE_DIR}/references/`
 </variables>
@@ -31,7 +31,7 @@ REFERENCES_DIR: `{CHANGE_DIR}/references/`
 
 ```python
 def context_workflow():
-    read_requirements(REQUIREMENTS_FILE)
+    read_proposal(PROPOSAL_FILE)
     inspect_repository_context()
     if change_depends_on_external_system_or_standard():
         inspect_external_constraints()
@@ -41,8 +41,8 @@ def context_workflow():
 
 ## Steps Explained
 
-**read_requirements**
-- Read `REQUIREMENTS_FILE` to understand the scope of the change.
+**read_proposal**
+- Read `PROPOSAL_FILE` to understand the scope of the change.
 - Identify modules, integration boundaries, external systems, and quality constraints mentioned.
 
 **inspect_repository_context**
@@ -74,7 +74,10 @@ Write two artifacts:
 - Omit `REFERENCES_DIR` files entirely when all relevant concisely fits in `CONTEXT_FILE`;
 
 **announce_completion**
-> "Context written to `{CONTEXT_FILE}` and `{REFERENCES_DIR}`. Let me know what else you'd like me to research."
+> "Context written to `{CONTEXT_FILE}`. I found enough evidence to proceed to design. Recommended next step: run `swe-design`."
+
+If evidence is insufficient, say:
+> "Context written to `{CONTEXT_FILE}`. Blocked items: <short list>. Recommended next question to resolve: <question>."
 
 </workflow>
 
@@ -82,12 +85,12 @@ Write two artifacts:
 - Do not reproduce code that is accessible in the repository; link to it instead.
 - Do not repeat information already captured in `CHANGE_DIR`.
 - Do not make any architectural or implementation decisions.
-- Do not modify `REQUIREMENTS_FILE` or any source code.
+- Do not modify `PROPOSAL_FILE` or any source code.
 - Do not create files outside `CHANGE_DIR`.
 </constraints>
 
 <checklist>
-- [ ] Requirements read and scope understood
+- [ ] Proposal read and scope understood
 - [ ] Repository structure, conventions, and relevant modules identified
 - [ ] External constraints captured (if applicable)
 - [ ] Context file and references written

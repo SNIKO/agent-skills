@@ -22,7 +22,7 @@ The plan must give an implementer — one who is skilled but unfamiliar with thi
 <variables>
 WORK_DIR: `.swe-work/`
 CHANGE_DIR: infer from user input (e.g. `.swe-work/{{DATE}}-{{SLUG}}/`)
-REQUIREMENTS_FILE: `{CHANGE_DIR}/01-requirements.md`
+PROPOSAL_FILE: `{CHANGE_DIR}/01-proposal.md`
 CONTEXT_FILE: `{CHANGE_DIR}/02-context.md`
 DESIGN_FILE: `{CHANGE_DIR}/03-design.md`
 PLAN_FILE: `{CHANGE_DIR}/04-plan.md`
@@ -30,23 +30,20 @@ PLAN_FILE: `{CHANGE_DIR}/04-plan.md`
 
 <workflow>
 
-## Read Context
+## 01: Read the proposal, context, and design
+- Read `PROPOSAL_FILE` to understand the scope of the change.
+- Read `CONTEXT_FILE` if it exists and all files in `REFERENCES_DIR` relevant to this change.
+- Use the context as the authoritative starting point and index
+- Read `DESIGN_FILE` to understand the implementation approach, component responsibilities, data flows, and cross-component contracts.
 
-- Read `REQUIREMENTS_FILE`
-- Read `CONTEXT_FILE` and relevant files in its `references/` directory.
-- Read `DESIGN_FILE`
-
-## Identify implementation tasks
-
+## 02: Identify implementation tasks
 - Use repository conventions, existing module boundaries, test patterns, and external constraints when forming tasks.
 - Break the design into the minimal set of coherent implementation tasks.
 - Prefer vertical slices that deliver a complete capability over horizontal technical layers.
 - A task must leave the repository in a valid, compilable, testable state.
+- Read <task_definition> for guidance on when to keep work in one task or split it into multiple tasks.
 
-Read <task_definition> for guidance on when to keep work in one task or split it into multiple tasks.
-
-## Order tasks by dependency and delivery value
-
+## 03: Order tasks by dependency and delivery value
 - Order tasks so each can build on completed, verified prior tasks.
 - Minimize temporary scaffolding and speculative abstractions.
 - Prefer this dependency shape where applicable:
@@ -59,13 +56,11 @@ Read <task_definition> for guidance on when to keep work in one task or split it
 - Do not force this sequence when repository architecture or delivery risk suggests a different order.
 - Explicitly record dependencies between tasks.
 
-## Write the plan
+## 04: Write the plan
+- Write `PLAN_FILE` following the [plan template](plan.template.md).
 
-Create `PLAN_FILE` using the format in `<plan_file_format>`
-
-## Fix issues
-
-Run the `<checklist>` section; revise the plan until all items pass.
+## 05: Self-check the plan
+- Run the `<checklist>` section; revise the plan until all items pass.
 
 </workflow>
 
@@ -97,61 +92,6 @@ A task may depend on previous tasks, but must not depend on undocumented future 
 
 </task_definition>
 
-<plan_file_format>
-
-````markdown
-# Implementation Plan: <title>
-
-## Change overview
-<!-- One paragraph summary of the problem, intended outcome, and scope. -->
-
-## Implementation Overview
-<!-- One paragraph summary of the implementation approach, major components, and how they fit together. -->
-
-## Requirement Coverage
-<!-- Table mapping requirements and design elements to the tasks that implement them. 
-| Requirement / Design Element | Covered By |
-|---|---|
-| FR-01: ... | Task 1, Task 3 |
-| FR-02: ... | Task 4 |
-| Design § External Integration | Task 2 |
-| Quality Attribute: rate limiting | Task 2 |-->
-
-## Task N — <title>
-
-**Goal**
-One or two sentences describing the completed behaviour or capability this task delivers.
-
-**Dependencies**
-- None
-- or: Task N — <title>
-- External prerequisite: ...
-
-**Files**
-[create|modify|delete] `path/to/file` — <description of what changes>
-
-- [ ] Step N: <title>
-<!-- Describe the step in implementation-level detail. Include inputs, outputs, invariants, error handling, and edge cases. -->
-
-- [ ] Step N+1: Verify
-  
-  - [ ] Observable behaviour 1
-  - [ ] Observable behaviour 2
-  - [ ] Required failure or error behaviour
-  - [ ] Required compatibility behaviour
-  - [ ] Required quality property
-
-- [ ] Step N+2: Commit
-
-  ```bash
-  git add tests/path/test.py src/path/file.py
-  git commit -m "feat: add specific feature"
-  ```
-
-````
-
-</plan_file_format>
-
 <principles>
 
 - Prefer tasks that deliver observable value or a stable dependency boundary over tasks that are technically convenient to implement.
@@ -168,13 +108,12 @@ One or two sentences describing the completed behaviour or capability this task 
 <checklist>
 
 - [ ] Requirements, context, and design were read
-- [ ] Requirements and design are approved or explicitly ready for planning
 - [ ] Scope check performed; subsystem split suggested if warranted
 - [ ] Every requirement and design element maps to at least one task
 - [ ] Tasks are ordered by explicit dependencies
 - [ ] Each task delivers a completed, coherent capability
-- [ ] Each task has exact repository locations or clearly marked `(assumed)` paths
-- [ ] Each task has implementation details sufficient for coding without guessing
+- [ ] Each task has exact repository locations
+- [ ] Each task has implementation details sufficient for coding without guessing or re-reading the design
 - [ ] Each task has acceptance criteria and verification commands
 - [ ] Each task covers failure behaviour and edge cases where required
 - [ ] Each task is safe to review, compile, and commit independently
@@ -182,6 +121,5 @@ One or two sentences describing the completed behaviour or capability this task 
 - [ ] No new architecture or unstated design decision was introduced
 - [ ] No placeholder content in the plan
 - [ ] Type and name consistency verified across all tasks
-- [ ] User reviewed and approved the plan
 
 </checklist>
