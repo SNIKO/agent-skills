@@ -105,7 +105,8 @@ Use this responsibility split to avoid overlap:
 - `quick-review.md`: all-in-one review only for Quick tier; catches obvious, high-confidence issues.
 - `spec-compliance.md`: stated requirements, integration/wiring, scope discipline. Comprehensive tier only.
 - `bugs-and-regression.md`: concrete runtime correctness, regressions, changed-callers impact, and behavior tests.
-- `code-quality.md`: maintainability, simplicity, naming, boundaries, over-engineering. No standalone docs/release/security/performance findings.
+- `code-quality.md`: maintainability, simplicity, naming, boundaries, over-engineering *within the chosen approach*. No standalone docs/release/security/performance findings.
+- `design.md`: whether a fundamentally simpler, verified alternative approach exists (reuse over reinvention, less code/ceremony, established repo patterns). Challenges the approach itself, not local cleanup owned by `code-quality`. Comprehensive tier only.
 - `documentation.md`: user/developer docs, examples, comments, and agent instruction freshness. No runtime correctness findings.
 - `security.md`: concrete exploitable security or secret exposure issues only. Run only when repo_profile and changed files justify it.
 - `performance.md`: concrete hot-path/scalability/resource regressions only. Run only when repo_profile and changed files justify it.
@@ -113,8 +114,8 @@ Use this responsibility split to avoid overlap:
 
 Tier mapping:
 - **Quick**: `./agents/quick-review.md`.
-- **Standard**: `./agents/bugs-and-regression.md`, `./agents/code-quality.md`, and `./agents/documentation.md` only when docs/examples/agent instructions/public text changed or are clearly required by the change.
-- **Comprehensive**: `./agents/spec-compliance.md`, `./agents/bugs-and-regression.md`, `./agents/code-quality.md`, plus optional specialists selected by relevance: `./agents/documentation.md`, `./agents/security.md`, `./agents/performance.md`, `./agents/release.md`.
+- **Standard**: `./agents/design.md`, `./agents/bugs-and-regression.md`, `./agents/code-quality.md`, and `./agents/documentation.md` only when docs/examples/agent instructions/public text changed or are clearly required by the change.
+- **Comprehensive**: `./agents/design.md`, `./agents/spec-compliance.md`, `./agents/bugs-and-regression.md`, `./agents/code-quality.md`, plus optional specialists selected by relevance: `./agents/documentation.md`, `./agents/security.md`, `./agents/performance.md`, `./agents/release.md`.
 
 Skip an agent when:
 - repository rules say its concern is irrelevant or a non-goal;
