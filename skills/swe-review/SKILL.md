@@ -1,5 +1,5 @@
 ---
-name: code-review
+name: swe-review
 description: "Use when the user asks to review a pull request, branch, staged changes, or local git diff for actionable code review findings."
 disable-model-invocation: true
 ---
