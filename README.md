@@ -34,6 +34,8 @@ The core idea: **separate deciding *what* from deciding *how* from deciding *in 
 
 ## The pipeline
 
+<img width="1012" height="1066" alt="image" src="https://github.com/user-attachments/assets/810838c1-2f9f-4926-ac8b-455e2c331806" />
+
 Every artifact lands in a single per-change workspace so the whole trail stays together:
 
 ```
