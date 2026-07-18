@@ -36,6 +36,7 @@ def design_workflow():
       ask_next_highest_value_design_question()
       wait_for_user_response()
 
+  do_design()
   write_draft_design_file()
 
   request_design_review()
@@ -67,12 +68,14 @@ def design_workflow():
 - Put the recommended option first and mark it `(Recommended)` when there is a sensible default.
 - Do not ask about decisions already answerable from the proposal or repository context.
 
+**do_design**
+- follow <principles> and <constraints> and think about design in terms of components, boundaries, contracts, and data flows.
+- make sure that components can actually see each other and that the data flows are feasible given the repository structure and dependencies.
+- make sure that design is built in such a way that internal, low level implementation can be done without violating or breaking the design.
+
 **write_draft_design_file**
 - write a `DESIGN_FILE` following the [design template](design.template.md)
-- fill in all four sections: repo structure changes, components, data flow, and contracts
-- keep it concise: target under 150 lines; prefer tables, annotated trees, and short bullets over prose
 - include only decisions and tradeoffs a reviewer must understand; avoid RFC-style background
-- omit sections that do not apply to the change (e.g. no structural changes for a pure logic fix)
 
 **request_design_review**
 > "Design written to `${DESIGN_FILE}`. Please review it and let me know if you want changes. If it looks good, recommended next step: run `swe-plan`."
@@ -110,7 +113,7 @@ def design_workflow():
 <constraints>
 
 - do not do any implementation
-- do not do low level design, internal implementation, or internal data flow inside a module
+- do not do low level design, internal implementation, or internal data flow inside a component unless it is necessary for the design decision or tradeoff
 
 </constraints>
 
