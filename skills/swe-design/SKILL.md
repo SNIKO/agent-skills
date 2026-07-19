@@ -5,12 +5,11 @@ disable-model-invocation: true
 ---
 
 <goal>
-Turn the approved proposal into a concise, easy-to-review high-level design document.
-Focus on structural changes to the repository, component responsibilities and data ownership, cross-component data flows, and the contracts/boundaries between components.
+Turn the approved proposal into a concise, easy-to-review high-level design document covering the structure, ownership, and contracts defined in <scope>.
 </goal>
 
 <anti-goal>
-- Do not prescribe private methods, helper functions, local class structure, or low-level algorithms unless they are necessary to satisfy a requirement, correctness property, security constraint, performance target, or integration contract.
+- Do not prescribe implementation details excluded by <scope>.
 - Do not begin implementation.
 </anti-goal>
 
@@ -69,9 +68,9 @@ def design_workflow():
 - Do not ask about decisions already answerable from the proposal or repository context.
 
 **do_design**
-- follow <principles> and <constraints> and think about design in terms of components, boundaries, contracts, and data flows.
+- follow <principles> and <scope> and think thoroughly about design
 - make sure that components can actually see each other and that the data flows are feasible given the repository structure and dependencies.
-- make sure that design is built in such a way that internal, low level implementation can be done without violating or breaking the design.
+- for each component, estimate what its low-level implementation will need — data, upstream/downstream dependencies, error and state information, configuration — and ensure the contracts and interfaces expose all of it, so implementation can proceed without requiring a design change
 
 **write_draft_design_file**
 - write a `DESIGN_FILE` following the [design template](design.template.md)
@@ -84,15 +83,13 @@ def design_workflow():
 
 <principles>
 
-- Focus on module boundaries, ownership, public interfaces, APIs, schemas, DTOs, events, and cross-boundary data flows.
 - Design boundaries and contracts so that local implementation defects are contained and cannot violate system-wide invariants, public contracts, data integrity, security boundaries, or integration guarantees.
-- Preserve implementation freedom inside a module, provided its externally visible contract and required quality properties are met.
-- Internal structure is intentionally left to implementation, except where it affects correctness, performance, security, reliability, or an external contract.
 
 - Prefer clear ownership of data, side effects, lifecycle transitions, and cross-module contracts.
 - Every cross-module contract has a clear owner responsible for compatibility and change coordination.
 - Define stable contracts at module and integration boundaries.
 - Do not expose internal domain models directly across boundaries when that would create unwanted coupling.
+- A contract is only complete once it gives the implementer every input, dependency, and signal their component needs; an implementer should never need to change a contract just to obtain something the design should have already provided.
 
 - Keep dependencies directional and avoid circular dependencies.
 - Minimize shared mutable state; make ownership and mutation rules explicit where shared state is unavoidable.
@@ -110,23 +107,33 @@ def design_workflow():
 
 </principles>
 
-<constraints>
+<scope>
 
-- do not do any implementation
-- do not do low level design, internal implementation, or internal data flow inside a component unless it is necessary for the design decision or tradeoff
+**In scope**
+- repository structure, modules, folders, and files
+- top-level components and their responsibilities
+- cross-component data models, flows, and ownership
+- public interfaces, APIs, and contracts between components
+- DB schema, API endpoints, and DTOs
 
-</constraints>
+**Out of scope**
+- private methods, helper functions, local class structure, internal data structures, and algorithms inside a component — unless necessary to satisfy a requirement, correctness property, security constraint, performance target, or integration contract
+- implementation itself
+
+</scope>
 
 <checklist>
 
 - [ ] Repository context and architecture understood
 - [ ] External constraints identified (if applicable)
 - [ ] Important design decisions include concise rationale or tradeoffs
-- [ ] Design satisfies all requirements and constraints
+- [ ] Design satisfies all requirements, scopes and follows principles
 - [ ] Components, boundaries, and interfaces clearly defined and aligned
 - [ ] Public APIs and data contracts specified
+- [ ] Each component's contracts give its implementer everything needed (data, dependencies, error/state signals) without requiring a design change
 - [ ] Data flows and event schemas documented
-- [ ] Design review completed
+- [ ] Failure modes and edge cases addressed where relevant
+- [ ] Module and file structure changes identified
 - [ ] Design document is ready for user review
 
 </checklist>
