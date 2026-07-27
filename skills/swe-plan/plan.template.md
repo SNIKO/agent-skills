@@ -1,41 +1,49 @@
-# Implementation Plan: <title>
+# Delivery Plan: <Change>
 
-## Change overview
-<!-- One paragraph summary of the problem, intended outcome, and scope. -->
+**Based on:** [`build-spec.md`](build-spec.md)
 
-## Implementation overview
-<!-- One paragraph summary of the implementation approach, major components, and how they fit together. -->
+## Delivery strategy
 
-## Requirement coverage
-<!-- Map each requirement and design element to the task(s) that implement it.
-     FR-01: Task 1, Task 3
-     FR-02: Task 4
-     Design § External Integration: Task 2
-     Quality Attribute — rate limiting: Task 2 -->
+<!-- One short paragraph: why a plan is needed, the ordering principle, and the first risk or capability validated. -->
 
----
+## Slices
 
-## Task N — <title>
+### Slice 1 — <Observable outcome>
 
-**Goal**
-<!-- One or two sentences describing the completed behaviour or capability this task delivers. -->
+**Outcome:** <What becomes usable, safe, or independently verifiable.>
 
-**Steps**
+**Depends on:** None | Slice N
 
-- [ ] Step N: <title>
-  <!-- Describe in implementation-level detail. Include inputs, outputs, invariants, error handling, and edge cases. -->
+**Spec references:**
 
-- [ ] Step N+1: Verify
+- `build-spec.md#<section>`
+- AC-...
 
-  - [ ] Observable behaviour 1
-  - [ ] Observable behaviour 2
-  - [ ] Required failure or error behaviour
-  - [ ] Required compatibility behaviour
-  - [ ] Required quality property
+**Expected areas:**
 
-- [ ] Step N+2: Commit
+<!-- Stable module or test areas, not an exhaustive private file prescription. -->
 
-  ```bash
-  git add tests/path/test.py src/path/file.py
-  git commit -m "feat: add specific feature"
-  ```
+- `src/...`
+- `tests/...`
+
+**Verification:**
+
+- **Command:** `...`
+- **Observable result:** ...
+- **Required failure/compatibility behaviour:** ...
+
+**Operational considerations:**
+
+<!-- Include only when this slice has migration, rollout, rollback, backfill, or monitoring implications. Otherwise omit. -->
+
+- ...
+
+### Slice 2 — <Observable outcome>
+
+...
+
+## Dependency summary
+
+<!-- Use a compact list or Mermaid graph only when dependencies are not obvious from slice order. Omit otherwise. -->
+
+- Slice 2 depends on Slice 1 because ...

@@ -1,63 +1,64 @@
 ---
 name: swe-worktree
-description: "Create an isolated git worktree for a plan ready for implementation. Use after swe-plan produces an approved plan."
+description: "Create an isolated git worktree for an SWE build spec or delivery plan. Use before implementation when the user wants the change isolated from the current working tree."
 disable-model-invocation: true
 ---
 
-<goal>
-Set up an isolated git worktree for an approved implementation plan.
-Derive the branch name and worktree path from the change, create the branch and worktree, copy all change artefacts into it, and confirm the workspace is ready.
-</goal>
+# Purpose
 
-<variables>
-CHANGE_DIR: infer from user input or the plan file path (e.g. `.swe-work/{{DATE}}-{{SLUG}}/`)
-SLUG: kebab-case label extracted from CHANGE_DIR (e.g. `auth-refresh`)
-REPO_NAME: basename of the repository root directory
-BRANCH_NAME: derived from SLUG; check repo git rules for branch naming convention; default to SLUG
-WORKTREE_PARENT: check repo git rules for worktree location preference; default to `../worktrees/{{REPO_NAME}}/`
-WORKTREE_PATH: `{{WORKTREE_PARENT}}/{{SLUG}}`
-</variables>
+Create a safe isolated branch and git worktree, copy the complete SWE change workspace into it, and report where implementation should continue. Worktrees are optional execution infrastructure, not a required specification stage.
 
-<workflow>
+# Inputs
 
-## 1. Read plan and repo context
+Infer from user input or an artifact path:
 
-- Infer `CHANGE_DIR` and `SLUG` from the plan file path or user input.
-- Read repository guidance (AGENTS.md, `.agents/`, README) for worktree location preferences and branch naming conventions.
-- Fall back to defaults when guidance is absent.
+- `CHANGE_DIR`: `.swe-work/<change>/`
+- `SLUG`: kebab-case change label
+- `REPO_NAME`: repository root basename
+- `BRANCH_NAME`: repository convention, otherwise `<slug>`
+- `WORKTREE_PARENT`: repository convention, otherwise `../worktrees/<repo-name>/`
+- `WORKTREE_PATH`: `<worktree-parent>/<slug>`
 
-## 2. Resolve worktree settings
+Use the change directory or `build-spec.md` named by the user. Include `plan.md` when it exists. If the change directory is ambiguous, ask which one to prepare.
 
-- Set `BRANCH_NAME` from repo naming convention, or default to `SLUG`.
-- Set `WORKTREE_PARENT` from repo guidance, or default to `../worktrees/{{REPO_NAME}}/`.
-- If the branch already exists, report it and ask the user whether to reuse it or choose a different name.
+# Workflow
 
-## 3. Create the branch and worktree
+1. **Inspect repository state.** Read repository git guidance and inspect `git status --short`, current branch, existing branches, and worktrees. Preserve unrelated changes.
+2. **Resolve names.** Follow repository branch and worktree conventions. Fall back to the defaults above only when guidance is absent.
+3. **Handle conflicts.** If the branch or path already exists, report the exact conflict and ask whether to reuse it or choose another name. Never overwrite or force-create it.
+4. **Create the worktree.** Run:
 
-```bash
-git worktree add -b "$BRANCH_NAME" "$WORKTREE_PATH"
+   ```bash
+   git worktree add -b "$BRANCH_NAME" "$WORKTREE_PATH"
+   ```
+
+   If creation fails, stop and report the command error before retrying.
+5. **Copy artifacts.** Copy the complete `CHANGE_DIR` to the same repository-relative location inside the worktree, including brief, architecture, build spec, optional plan, state, and every spike report and saved spike artifact.
+6. **Verify readiness.** Confirm the new path, branch, copied artifact paths, and clean worktree status.
+
+# Constraints
+
+- Do not modify source files in the original working tree.
+- Do not overwrite, delete, or reuse a branch or worktree without user approval.
+- Do not install dependencies, run migrations, push, deploy, open a pull request, or begin implementation.
+- Do not require `plan.md` when the build spec is intentionally one slice.
+- Stop immediately when worktree creation or artifact copying fails.
+
+# Output
+
+```markdown
+## Worktree ready
+
+- **Path:** `<absolute worktree path>`
+- **Branch:** `<branch>`
+- **Artifacts:** `<worktree>/.swe-work/<change>/`
+- **Execution source:** `plan.md` | `build-spec.md` as one slice
+- **Next:** Run `swe-execute` in the new worktree.
 ```
 
-- If this fails, report the error and ask the user how to proceed before retrying.
-- Do not force-create or overwrite an existing branch or worktree without explicit user approval.
+# Completion Criteria
 
-## 4. Copy change artefacts
-
-```bash
-cp -r "$CHANGE_DIR" "$WORKTREE_PATH/$CHANGE_DIR"
-```
-
-Copy the full `CHANGE_DIR` into the worktree at the same relative path. Include all files: proposal, context, design, plan, and any references.
-
-## 5. Confirm ready
-
-> "Worktree created at `{{WORKTREE_PATH}}` on branch `{{BRANCH_NAME}}`. Change artefacts copied from `{{CHANGE_DIR}}`. Ready to implement."
-
-</workflow>
-
-<constraints>
-- do not modify any files in the original repository working tree.
-- do not push the branch or open a pull request.
-- do not run dependency installation or tests — those are the implementer's responsibility.
-- do not proceed past **create_branch_and_worktree** if the worktree creation failed.
-</constraints>
+- The worktree and branch exist without overwriting user state.
+- Selected artifacts are present at the expected relative path.
+- The original working tree has no changes caused by this skill beyond artifact copying requested by the user.
+- The final response gives the exact absolute path and branch.

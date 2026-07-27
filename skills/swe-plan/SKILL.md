@@ -1,125 +1,90 @@
 ---
 name: swe-plan
-description: "Break an approved design into a sequenced, verifiable implementation plan. Use after swe-design produces an approved design. Do not use before the design is approved."
+description: "Create an optional delivery plan from a build specification. Use only when implementation needs multiple independently verifiable slices, sessions, agents, migrations, backfills, or rollout coordination."
 disable-model-invocation: true
 ---
 
-<goal>
-Decompose an approved design into an ordered sequence of self-contained implementation tasks.
-Each task must be small enough to implement in a single focused session, independently verifiable, and safe to commit on its own.
-The plan must give an implementer — one who is skilled but unfamiliar with this codebase — everything they need to write each task correctly without guessing.
-</goal>
+# Purpose
 
-<anti-goal>
-- Do not implement any code.
-- Do not revise requirements or design.
-- Do not prescribe private method bodies, local variable names, or internal algorithms unless they are needed to satisfy a verification step, a cross-task contract, or a correctness constraint.
-- Do not produce tasks so large they cannot be reviewed in isolation.
-- Do not produce tasks so small they cannot compile, pass tests, or be committed without the next task.
-- Do not write placeholder content — no "TBD", "TODO", "add appropriate error handling", or "similar to task N".
-</anti-goal>
+Decide delivery order and verification boundaries for complex execution. A plan coordinates specified work; it does not repeat low-level design or narrate how to code it.
 
-<variables>
-WORK_DIR: `.swe-work/`
-CHANGE_DIR: infer from user input (e.g. `.swe-work/{{DATE}}-{{SLUG}}/`)
-PROPOSAL_FILE: `{CHANGE_DIR}/01-proposal.md`
-CONTEXT_FILE: `{CHANGE_DIR}/02-context.md`
-DESIGN_FILE: `{CHANGE_DIR}/03-design.md`
-PLAN_FILE: `{CHANGE_DIR}/04-plan.md`
-</variables>
+# Inputs and Workspace
 
-<workflow>
+Use the `build-spec.md` named by the user, or infer the current change only when unambiguous. Read the brief and architecture only when needed to understand acceptance, dependencies, or risk. Read relevant spike reports and artifacts when they affect sequencing, feasibility, rollout, or an early risk-reduction slice. Write `.swe-work/<change>/plan.md` using [plan.template.md](plan.template.md) only when a separate plan is justified and can be sequenced safely.
 
-## 01: Read the proposal, context, and design
-- Read `PROPOSAL_FILE` to understand the scope of the change.
-- Read `CONTEXT_FILE` if it exists and all files in `REFERENCES_DIR` relevant to this change.
-- Use the context as the authoritative starting point and index
-- Read `DESIGN_FILE` to understand the implementation approach, component responsibilities, data flows, and cross-component contracts.
+# Workflow
 
-## 02: Identify implementation tasks
-- Use repository conventions, existing module boundaries, test patterns, and external constraints when forming tasks.
-- Break the design into the minimal set of coherent implementation tasks.
-- Prefer vertical slices that deliver a complete capability over horizontal technical layers.
-- A task must leave the repository in a valid, compilable, testable state.
-- Read <task_definition> for guidance on when to keep work in one task or split it into multiple tasks.
+1. **Decide whether to plan.** Apply the planning threshold below. If the build spec is one coherent implementation slice, do not create `plan.md`; report that execution can proceed directly from the spec.
+2. **Identify delivery slices.** Find the smallest set of completed, observable or independently risk-reducing outcomes. Prefer thin end-to-end slices over technical layers.
+3. **Order by dependency and learning.** Establish prerequisites, then prioritize early validation of expensive assumptions, integration risk, migration safety, and user-visible value.
+4. **Preserve valid intermediate states.** Every slice must leave the repository buildable, testable, and operationally safe under the specified compatibility strategy.
+5. **Reference authoritative detail.** Link each slice to exact build-spec sections and acceptance criteria. Do not copy their contracts.
+6. **Define verification.** Give runnable repository commands and observable results for each slice, including rollback or operational checks only where relevant.
+7. **Check plan size.** If more than roughly eight slices are needed, recommend splitting the change or introducing explicit phases rather than producing a giant plan.
+8. **Complete, skip, or stop.** Write `plan.md` only when a separate plan is justified and fully sequenceable. If no plan is needed, leave no plan artifact. If an upstream gap prevents safe sequencing, report it and do not create or overwrite `plan.md`.
 
-## 03: Order tasks by dependency and delivery value
-- Order tasks so each can build on completed, verified prior tasks.
-- Minimize temporary scaffolding and speculative abstractions.
-- Prefer this dependency shape where applicable:
-  1. Foundation / schema / migration
-  2. Boundary contract / owned interface
-  3. Integration or domain capability
-  4. Public API or workflow
-  5. UI / consumer
-  6. Observability / rollout hardening
-- Do not force this sequence when repository architecture or delivery risk suggests a different order.
-- Explicitly record dependencies between tasks.
+# Planning Threshold
 
-## 04: Write the plan
-- Write `PLAN_FILE` following the [plan template](plan.template.md).
+Create a plan when one or more apply:
 
-## 05: Self-check the plan
-- Run the `<checklist>` section; revise the plan until all items pass.
+- implementation has multiple independently verifiable outcomes;
+- work spans several focused sessions or agents;
+- migrations, backfills, compatibility windows, rollout, or rollback require ordering;
+- an external integration or risky assumption should be validated before broad implementation;
+- intermediate repository or production states require deliberate coordination;
+- teams can work in parallel against stable build-spec contracts.
 
-</workflow>
+Skip the plan when the build spec can be implemented and verified as one coherent slice with straightforward intermediate state.
 
-<task_definition>
+# Slice Rules
 
-A plan task is a completed, verifiable, committable increment of functionality.
+A slice must:
 
-A task is complete only when:
-- its intended behaviour exists,
-- required tests or checks exist and pass,
-- relevant contracts are satisfied,
-- error handling and edge cases required by the design are included,
-- documentation or configuration changes necessary for safe operation are included,
-- the repository remains in a valid, compilable state after the task is applied.
+- produce completed behaviour or a stable, independently valuable risk-reduction boundary;
+- include its production changes, tests, required configuration, and documentation;
+- depend only on completed earlier slices and build-spec contracts;
+- leave the repository valid after that slice alone;
+- have one clear outcome and deterministic verification.
 
-A task may depend on previous tasks, but must not depend on undocumented future work for its own correctness.
+A schema migration, compatibility layer, contract-tested external client, or enabling refactor may be a separate slice when it is independently safe and verifiable. Do not create placeholder interfaces, empty scaffolding, or horizontal layers that become useful only after undocumented future work.
 
-**When to keep work in one task**
-- The code, tests, and contract changes together implement one behaviour.
-- Splitting would leave incomplete functionality or require fake scaffolding.
-- The behaviour cannot be meaningfully verified until all changes are present.
+# Research and Upstream Revision
 
-**When to split work into multiple tasks**
-- A migration or compatibility layer can be completed and verified independently.
-- An external client can be contract-tested before consumers use it.
-- A backend capability can be verified before a UI consumes it.
-- A rollout or backfill has separate operational risk.
-- A refactor is needed to safely enable later work and has its own testable outcome.
+If sequencing depends on a clear, bounded factual unknown—such as migration duration, deployment compatibility, backfill throughput, or an external operational limit—run a safe spike under the current change workspace and resume planning from its evidence. Ask before expensive, production-facing, authenticated, or mutating investigation.
 
-</task_definition>
+Planning must not invent requirements, architecture, contracts, paths, or error behaviour. If a spike is inconclusive or the build spec cannot be sequenced safely:
 
-<principles>
+1. Stop planning.
+2. Identify the exact upstream gap or contradiction.
+3. Return to `swe-spec`, `swe-architect`, or `swe-shape` as appropriate.
+4. Do not create or overwrite `plan.md`; a present plan should be executable rather than a partial draft.
 
-- Prefer tasks that deliver observable value or a stable dependency boundary over tasks that are technically convenient to implement.
-- Do not create a task solely to introduce a stub, placeholder, or empty interface immediately overwritten by the next task.
-- Each task's verification steps must be runnable against the repository after that task alone is applied.
-- Cross-task contracts (types, interface signatures, event schemas) belong in the task that defines them, not repeated in each consumer.
-- Test code belongs in the same task as the production code it tests, unless the tests require infrastructure introduced by a later task.
-- Do not invent file paths, symbols, commands, APIs, or conventions without marking them as `(assumed)`.
-- Include migrations, configuration, observability, feature flags, and rollback steps in the task that requires them for safe completion.
-- Do not create files outside `CHANGE_DIR`.
+# Constraints
 
-</principles>
+- Do not include API schemas, SQL, interface signatures, algorithms, or detailed code mutations.
+- Do not prescribe private methods, local variables, or step-by-step coding instructions.
+- Do not add per-slice commit commands.
+- Do not require an implementer to treat a task as standalone documentation; they must follow linked authoritative artifacts.
+- Do not create a plan merely because the framework has a planning skill.
+- Do not begin implementation.
 
-<checklist>
+# Output
 
-- [ ] Requirements, context, and design were read
-- [ ] Scope check performed; subsystem split suggested if warranted
-- [ ] Every requirement and design element maps to at least one task
-- [ ] Tasks are ordered by explicit dependencies
-- [ ] Each task delivers a completed, coherent capability
-- [ ] Each task has exact repository locations
-- [ ] Each task has implementation details sufficient for coding without guessing or re-reading the design
-- [ ] Each task has acceptance criteria and verification commands
-- [ ] Each task covers failure behaviour and edge cases where required
-- [ ] Each task is safe to review, compile, and commit independently
-- [ ] Migration, rollout, observability, and rollback concerns are included where relevant
-- [ ] No new architecture or unstated design decision was introduced
-- [ ] No placeholder content in the plan
-- [ ] Type and name consistency verified across all tasks
+If no plan is needed, do not create `plan.md`; report the reason and recommend implementation directly from `build-spec.md` as one slice.
 
-</checklist>
+If a plan is needed and can be completed, write `plan.md` and report:
+
+- planning rationale;
+- number and ordering strategy of slices;
+- first risk or capability validated;
+- recommended next step, normally `swe-worktree` or `swe-execute`.
+
+If planning is blocked, do not write the artifact; report the upstream gap and revision path.
+
+# Completion Criteria
+
+Finish with exactly one outcome:
+
+- **Plan written:** A separate plan is justified; every slice has a coherent outcome, dependencies, spec references, expected areas, and deterministic verification; ordering preserves valid intermediate states; and the artifact contains no duplicated contracts or coding narration.
+- **Plan skipped:** The build spec is one coherent slice, no `plan.md` was created, and the response directs execution to the build spec.
+- **Returned upstream:** The sequencing gap and earliest affected artifact are explicit, and `plan.md` was not created or overwritten.
