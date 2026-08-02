@@ -46,9 +46,12 @@ The corresponding artifacts are deliberately different in scope and lifetime:
 ```text
 .swe-work/<change>/
   brief.md
-  architecture.md       # optional
-  build-spec.md         # optional for tiny/direct changes
-  plan.md               # optional
+  architecture.md       # canonical agent contract; optional
+  architecture.html     # derived human review artifact
+  build-spec.md         # canonical agent contract; optional for tiny/direct changes
+  build-spec.html       # derived human review artifact
+  plan.md               # canonical agent contract; optional
+  plan.html             # derived human review artifact
   state.md              # created during execution
   spikes/               # research reports, probes, responses, and experiments
 ```
@@ -61,10 +64,11 @@ The corresponding artifacts are deliberately different in scope and lifetime:
 | `architecture.md` | Components, ownership, boundaries, conceptual data, runtime flows | Exact DTO, schema, or file specification |
 | `build-spec.md` | Exact shared contracts and repository delta | Product background or architecture narrative |
 | `plan.md` | Delivery slices, dependencies, sequencing | Repeated contracts or coding instructions |
+| paired `.html` review artifact | Human-readable rendering of its paired Markdown only | An authoritative contract, independent decision record, or agent input |
 | `state.md` | Completed work, remaining work, verification, divergence | A copy of the specification |
 | spike | Evidence about repository impact, external behaviour, feasibility, or another research question | Product decisions or production implementation |
 
-A decision belongs to one authoritative artifact. Lower-level artifacts link to it rather than restating it.
+A decision belongs to one authoritative artifact. Lower-level artifacts link to it rather than restating it. Markdown is the authoritative, token-efficient contract between agents. The paired HTML files are static, direct-from-disk human review surfaces; after human feedback, update the Markdown first and regenerate its HTML counterpart.
 
 ## Human-controlled progression
 
@@ -97,6 +101,10 @@ Multi-session, migration, backfill, or rollout-heavy feature
   swe-shape → swe-architect → swe-spec → swe-plan
             → swe-execute one slice at a time → swe-review
 
+Uncertain or exploratory change, reviewed depth-by-depth
+  swe-shape → swe-spec-new (concept → structural → contract, one confirmed
+              tier at a time, per scope) → swe-plan or swe-execute → swe-review
+
 Research needed at any stage
   any stage → swe-spike → incorporate findings in the owning artifact → continue
 ```
@@ -122,30 +130,44 @@ Answers a concrete repository, dependency, external-system, feasibility, behavio
 - **Saved evidence:** runnable probe scripts, captured and sanitized responses, fixtures, benchmark results, query output, or small research-only prototypes when useful
 - **Excludes:** silently changing requirements or architecture and treating research code as production implementation
 
-### `swe-architect` — high-level architecture
+### `swe-architect` — high-level architecture and interface design
 
-Defines top-level components, responsibilities, ownership, dependency direction, conceptual data, and important normal and failure flows. It considers credible alternatives but preserves only concise decision rationale.
+Defines top-level components, responsibilities, ownership, dependency direction, conceptual data, conceptual repository layout, and important normal and failure flows. For material user-facing work, it also defines screen responsibilities, navigation, layout hierarchy, visual direction, UI-state ownership, and linked low-fidelity review mockups. It considers credible alternatives but preserves only concise decision rationale. There is no fixed template; sections are shaped to fit the change.
 
-- **Artifact:** `architecture.md`
-- **Excludes:** exact routes, DTOs, SQL columns, migrations, interface signatures, and private implementation
+- **Review artifact:** `architecture.html`, authored and iterated directly with the user — must make the current state, the new state, and why it's changing clear on its own
+- **Canonical artifact:** `architecture.md`, written only once the user confirms the architecture in `architecture.html`, after which `architecture.html` is regenerated from it like every other paired artifact
+- **Excludes:** exact routes, DTOs, SQL columns, migrations, interface signatures, implementation-critical UI/component contracts, and private implementation
 - **Optional:** skip when existing architecture already determines the change
 
 ### `swe-spec` — low-level build specification
 
 Defines exact behaviour at shared, persistent, externally visible, security-sensitive, and expensive-to-change seams while leaving private implementation flexible.
 
-- **Artifact:** `build-spec.md`
+- **Canonical artifact:** `build-spec.md`
+- **Human review artifact:** `build-spec.html` (derived from Markdown)
 - **Includes:** exact APIs, DTOs, module contracts, events, schemas, migrations, configuration, failure semantics, repository wiring, and deterministic verification when relevant
 - **Excludes:** product narrative, repeated architecture, task sequencing, and method-by-method instructions
+
+### `swe-spec-new` — progressive-disclosure specification
+
+Produces one continuously deepening artifact instead of separately staged ones: a concept pass (idea, top-level components and integration, headline endpoints, UI mockup when applicable), then as many structural or contract passes as the change actually needs — each added only for the scope the user confirms and asks to go lower on. Different scopes (UI, API, data model, and so on) can sit at different depths in the same document across many sessions. There is no fixed template or fixed tier count; depth ordering (abstract on top, exact at the bottom) is the only fixed structure.
+
+- **Canonical artifact:** `spec.html`, authored and deepened directly (no separate Markdown source), read directly by downstream skills such as `swe-plan` and `swe-execute`
+- **Excludes:** private methods, classes, helpers, and algorithms at any depth — hands off to `swe-execute` once enough scopes reach exact contracts
 
 ### `swe-plan` — optional delivery sequencing
 
 Creates a plan only when implementation needs multiple independently verifiable slices, sessions, agents, migrations, backfills, or rollout coordination.
 
-- **Artifact:** `plan.md`
+- **Canonical artifact:** `plan.md`
+- **Human review artifact:** `plan.html` (derived from Markdown)
 - **Prefers:** thin end-to-end or independently risk-reducing slices
 - **Excludes:** repeated contracts, detailed code mutations, and commit commands
 - **Skipped:** when `build-spec.md` is one coherent implementation slice
+
+### `swe-artifact` — static human review rendering
+
+Renders a canonical `architecture.md`, `build-spec.md`, or `plan.md` as its paired standalone HTML file. It uses embedded CSS and no server, build step, external dependency, or editing integration. It is a presentation helper used by the corresponding authoring skills, not an independent decision stage.
 
 ### `swe-worktree` — optional isolation
 
@@ -179,7 +201,7 @@ Do not hide an upstream contradiction inside a lower-level artifact or silently 
 
 ## Enforcement
 
-Markdown records intent; deterministic tools enforce it. Build specs and implementation should map important requirements to the strongest useful mechanism available:
+Canonical Markdown records intent; deterministic tools enforce it. Static HTML improves human review but does not participate in the agent workflow or replace deterministic checks. Build specs and implementation should map important requirements to the strongest useful mechanism available:
 
 - behavioural, integration, contract, migration, and end-to-end tests;
 - type checking and schema validation;

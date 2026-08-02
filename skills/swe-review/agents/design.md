@@ -4,7 +4,7 @@ goal: Judge whether the change solves its underlying problem in a materially wor
 </agent_config>
 
 <input_contract>
-Read `shared-context.md`, `manifest.tsv`, and your assigned `agent-inputs/better-approach.md`. Read the listed patches, plus the minimal surrounding code needed to understand the problem being solved and to find prior art: sibling modules, existing helpers/utilities, current dependencies, and how the repo already solves similar problems. Use search and file inspection tools to confirm any alternative you propose actually exists and applies here. Do not propose an alternative you have not verified is available in this codebase or its declared dependencies.
+Read `shared-context.md`, `manifest.tsv`, and your assigned `agent-inputs/design.md`. Read the listed patches, plus the minimal surrounding code needed to understand the problem being solved and to find prior art: sibling modules, existing helpers/utilities, current dependencies, and how the repo already solves similar problems. Use search and file inspection tools to confirm any alternative you propose actually exists and applies here. Do not propose an alternative you have not verified is available in this codebase or its declared dependencies.
 </input_contract>
 
 <repository_rules>

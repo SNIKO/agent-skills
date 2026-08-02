@@ -1,107 +1,91 @@
 ---
-name: swe-spec
-description: "Create an implementation-ready low-level build specification from a brief and, when required, architecture. Use to define exact shared contracts, persistence, APIs, migrations, wiring, and deterministic verification before coding."
+name: swe-spec-new
+description: "Create and progressively deepen design and specification for a change"
 disable-model-invocation: true
 ---
 
 # Purpose
 
-Translate the selected intent and architecture into exact, repository-grounded changes at shared, persistent, externally visible, security-sensitive, and expensive-to-change seams. Produce `build-spec.md` while leaving private implementation choices flexible.
+Maintain one evolving `{SPEC_FILE}` per change, always readable top-to-bottom from the most abstract decisions to the most exact ones. Depth is earned per scope, one user-confirmed tier at a time, and is never produced further ahead than requested. Different scopes of the same change (UI, an API surface, the data model, an integration, and so on) may sit at different depths simultaneously, each clearly separated, so the same document keeps growing correctly across many sessions instead of being regenerated from scratch.
 
-# Inputs and Workspace
+# Inputs
 
-Use the `brief.md` named by the user, or infer the current change only when unambiguous. Read `architecture.md` when the brief selected an architecture path or when the change alters boundaries, ownership, or cross-module data flow. Inspect relevant `spikes/*/spike.md` reports and saved artifacts, especially captured payloads, impact analyses, fixtures, and experiments that affect exact contracts.
+CHANGE_DIR - the directory for the current change, typically `.swe-work/<change>`, infer from the conversation if not explicitly named.
+BRIEF_FILE: `{CHANGE_DIR}/brief.md` - the brief for the change
+SPEC_FILE: `{CHANGE_DIR}/spec.html` - the canonical specification artifact, progressively deepened in place per scope and tier
 
-Write `.swe-work/<change>/build-spec.md` using [build-spec.template.md](build-spec.template.md) only after all implementation-blocking contract decisions are resolved.
+# Tools & Skills
+
+[swe-artifact](../swe-artifact/SKILL.md) - use when generating or updating `{SPEC_FILE}` to produce a human-reviewable HTML artifact from the Markdown content in required style and format.
 
 # Workflow
 
-1. **Read authoritative inputs.** Read the selected brief, architecture when present, relevant spike reports and artifacts, repository guidance, and existing contracts relevant to the change. Treat spikes as evidence; the brief and architecture still own intent and design decisions.
-2. **Inspect exact repository seams.** Verify existing paths, symbols, framework conventions, test commands, migration mechanisms, API patterns, configuration, and observability conventions. Delegate clear factual unknowns to a spike using the Research Delegation rules below rather than inventing details.
-3. **Define the repository delta.** Identify exact contract, wiring, migration, configuration, documentation, and stable module locations that must be added, changed, or removed. Do not enumerate every private helper file.
-4. **Specify shared contracts.** Define exact public or cross-module interfaces, routes, DTOs, events, serialization, errors, compatibility behaviour, and ownership where relevant.
-5. **Specify persistence.** Define exact tables, columns, types, nullability, constraints, indexes, migrations, rollback or forward-recovery behaviour, transactions, and idempotency where relevant.
-6. **Specify runtime obligations.** Resolve state transitions, validation, retries, timeouts, duplicate handling, partial failure, security checks, configuration, logging, metrics, and rollout mechanics that implementation must preserve.
-7. **Define verification contracts.** Map each acceptance criterion and critical invariant to the highest-value deterministic boundary and repository command. Prefer behavioural, integration, contract, migration, and end-to-end checks over tests tied only to private structure.
-8. **Check consistency.** Verify names and types across API, module, event, and persistence contracts. Ensure every architecture boundary has enough information to implement without changing that boundary.
-9. **Complete or stop.** If an exact contract cannot be specified without changing intent, architecture, or missing evidence, report the gap and do not create or overwrite `build-spec.md`. Otherwise write the complete build spec.
+1. **Orient.** Read the `{BRIEF_FILE}`, the full current `{SPEC_FILE}` if it exists, and repository context relevant to the requested scope. Identify every scope already present and the tier each has reached.
+2. **Resolve the request.** Apply the Scope and Depth Model above to determine which scope(s) to touch and the target tier for each.
+3. **Ask only what's blocking.** Ask the smallest set of questions where two or more options have genuinely different tradeoffs at the target tier; do not ask about decisions the repository, the brief, or a shallower tier already settled. Offer concrete options with a recommendation when one exists.
+4. **Design the content for that scope and tier.** Decide what a reviewer actually needs to see at this depth for this kind of scope. For instance, a UI scope's shallowest tier might need a wireframe, screen list, and navigation shape, while its deepest tier needs exact component contracts, states, and copy; a data scope might move from conceptual entities to exact tables, columns, and migrations; an API scope might move from named operations and payload shapes to exact routes, DTOs, and error codes. Choose whatever headings communicate this specific decision well.
+5. **Keep private detail out.** Regardless of tier, do not specify private methods, internal helper functions, local variables, or algorithm internals unless a correctness, security, or contract requirement genuinely depends on them.
+6. **Integrate, do not regenerate.** Merge the new or revised content directly into `{SPEC_FILE}` at the right tier section, next to its scope's existing material. Leave every other scope and tier untouched. If a deeper decision changes something a shallower tier asserted, update that shallower statement so the two never contradict; do not duplicate the same decision at both tiers.
+7. **Maintain the index.** Keep a short top-of-document index listing each scope and the deepest tier it has reached, so a returning session can immediately see what exists and what can still be requested.
+8. **Report.** After writing `{SPEC_FILE}`, ask the user to review it. State what depth is now available for which scope(s), and that they can approve, request changes at the current tier, or ask to go deeper on any scope.
+
+# Scope and Depth Model
+
+Two independent things must be identified before writing anything:
+
+- **Scope** — the topic being specified right now (for example, UI, an API surface, the data model, an integration, or rollout/config). A change accumulates as many scopes as it actually needs; do not pre-create scopes nobody has asked about yet.
+- **Depth tier** — how exact the current pass is for that scope, ranging from the most abstract useful statement of the idea down to the most exact contract. There is no fixed set or count of tiers: decide, per scope and per change, how many distinct levels of detail are actually worth reviewing separately. A trivial scope may only ever need two tiers (concept, exact); a genuinely complex one may warrant three or four. Do not invent an intermediate tier that adds ceremony without adding a real reviewable decision.
+
+The only fixed rule is ordering: within the document as a whole, content belonging to a shallower tier must never sit below content from a deeper tier. Organize the document primarily by tier, shallowest first, with every scope's material for that tier grouped underneath it; a scope that hasn't reached a tier yet simply has nothing there yet.
+
+## Determining the tier for the current request
+
+- **No scope or depth stated, and the scope has no prior content:** produce the shallowest useful tier for the whole change — normally the idea or approach, the top-level components or responsibilities and how they integrate, headline API operations or user-facing entry points if applicable, and a UI mockup or wireframe if the change is user-facing. Keep it one reviewable pass, not an exhaustive one.
+- **Scope and/or depth stated explicitly** (for example "just the UI", "design the database tables", "high level only"): honor the requested scope and go straight to the requested depth for it, even if that skips tiers that would normally come first. Still add a brief entry at each shallower tier for that scope if none exists, so the document stays readable top-down — a short summary, not a placeholder.
+- **User asks to go deeper, go lower, get more detail, or approves and asks to continue:** advance the scope just discussed (or the scope named) exactly one tier further than what already exists for it. Never skip ahead to a deeper tier than requested, and never silently deepen a scope the user did not ask about.
+- **A scope already has content and the user gives feedback without asking to go deeper:** treat it as a revision at its current tier, not an advance.
 
 # Decision Rules
 
-## Required exactness
-
-Be exact about any relevant:
-
-- public API route, method, request, response, status, and error contract;
-- cross-module interface, event, command, result, and ownership boundary;
-- database table, column, type, constraint, index, migration, and compatibility rule;
-- external integration request policy, payload interpretation, timeout, rate limit, and error mapping;
-- configuration key, secret boundary, permission, feature flag, metric, and rollout condition;
-- deterministic acceptance or invariant check.
-
-## Deliberate flexibility
-
-Do not freeze:
-
-- private methods, local classes, helper functions, or variable names;
-- internal algorithms unless correctness, performance, security, or interoperability depends on them;
-- every implementation file when a stable module location is sufficient;
-- unit-test organization unrelated to observable behaviour or a system seam.
-
-New contract or wiring paths must be explicit. Private files may be listed as `expected` rather than mandatory when their exact shape is not a shared decision.
-
-## Verification depth
-
-- Use integration or contract tests for module and external seams.
-- Use migration tests for schema and compatibility behaviour.
-- Use end-to-end tests for critical user or system workflows.
-- Use unit tests for dense rules or state transitions where they provide faster diagnosis.
-- Put architecture restrictions into deterministic import, lint, type, schema, or CI checks when the repository supports them.
+- A new tier for a scope must contain at least one decision a reviewer could not already get from the shallower tier; if it would only restate the shallower tier in different words, it is not a new tier.
+- Prefer extending an existing scope section over creating a near-duplicate one; only split a scope into two when they have genuinely different owners, audiences, or review cadences.
+- When a scope's deepest tier reaches exact, unambiguous contracts (routes, schemas, migrations, component props, and equivalents) sufficient to implement without further design decisions, say so explicitly — that scope is complete, not merely detailed.
+- When most or all in-scope areas of the change have reached that exact tier, recommend `swe-plan` (if delivery needs coordinated slices) or proceeding straight to implementation; otherwise state which scopes still need deepening.
+- If a request would require inventing a product or architectural decision rather than choosing among informed options, ask instead of guessing.
 
 # Research Delegation
 
-When an exact contract depends on unknown repository usage, external payloads, dependency behaviour, migration feasibility, or another observable fact:
+When a decision at the current tier depends on an unknown repository fact, external behaviour, or dependency capability, run `swe-spike` automatically when the question is clear, bounded, and safe; preserve its evidence under the change workspace and resume from it. Ask the user first for expensive, authenticated, or mutating investigation. If research is inconclusive, do not finalize that tier for that scope; report the gap instead.
 
-- run a spike automatically when the question is clear, bounded, and safe;
-- preserve probes, responses, impact maps, or experiments under the current change workspace;
-- resume specification using the evidence, while keeping decisions in the build spec rather than the spike;
-- ask the user before consequential requests or when choosing what to investigate requires changing intent or architecture;
-- if research is inconclusive, do not finalize the build spec.
+# Brief Revision Rule
 
-# Upstream Revision Rule
+If work on any scope or tier reveals that the brief itself is infeasible, contradictory, or missing a product decision:
 
-If exact design or spike evidence reveals an invalid brief or architecture assumption:
-
-1. Stop specification work.
-2. Identify the earliest incorrect artifact.
-3. Explain the evidence and downstream impact.
-4. Return to `swe-shape` or `swe-architect` as appropriate.
-5. Do not create or overwrite `build-spec.md`; a present build spec should be implementation-ready, not a partial draft.
-6. Do not compensate by silently changing the boundary inside the build spec.
+1. Stop work on the affected scope.
+2. Explain the evidence and which part of the brief it contradicts.
+3. Return to `swe-shape` rather than resolving it silently inside `{SPEC_FILE}`.
+4. Do not add or deepen content for that scope until the brief is corrected.
 
 # Constraints
 
-- Do not repeat the brief or architecture summary. Link them and describe only the delta.
-- Do not write an implementation sequence, task list, commit plan, or method-by-method coding instructions.
-- Do not use `TBD`, vague error handling, assumed commands, or invented repository conventions.
-- Keep sections conditional: omit API, persistence, events, rollout, or other sections when they do not apply.
-- Resolve blockers before writing the artifact rather than embedding workflow state in it.
+- Do not use a fixed template of sections or a fixed number of tiers; decide structure per change and per scope, keeping only the ordering rule fixed: shallower tiers above deeper ones.
+- Do not deepen a scope further than the user asked for in this request.
+- Do not silently regenerate or reorder scopes or tiers the user did not ask about.
+- Do not specify private implementation detail unless a stated requirement genuinely depends on it.
 - Do not begin implementation.
 
 # Output
 
-When specification is complete, write `build-spec.md` and report:
+After writing or updating `{SPEC_FILE}`, report:
 
-- exact shared seams being changed;
-- migration or compatibility impact;
-- verification boundaries;
-- whether `swe-plan` is useful or implementation can proceed as one slice.
-
-When blocked, do not write the artifact; report the missing decision or evidence and the earliest upstream artifact that must change.
+- which scope(s) and tier(s) were added or revised;
+- the current deepest tier reached per scope, and which scopes (if any) are exact-contract complete;
+- the artifact path, `.swe-work/<change>/spec.html`;
+- what the user can ask for next (approve, revise this tier, or go deeper on a named scope), and whether enough scopes are contract-complete to move to delivery.
 
 # Completion Criteria
 
-Finish with exactly one outcome:
-
-- **Build spec written:** Exact shared and persistent contracts are internally consistent and repository-grounded; acceptance criteria and critical invariants have deterministic verification; relevant migration, compatibility, failure, configuration, and operational behaviour are covered; private implementation remains flexible; and no unresolved blocker prevents implementation.
-- **Returned upstream:** The missing decision or evidence, downstream impact, and earliest affected artifact are explicit, and `build-spec.md` was not created or overwritten.
+- `{SPEC_FILE}` reads top-to-bottom from the most abstract material to the most exact, across every scope it contains.
+- Every scope's content stops exactly at the tier the user has confirmed or explicitly requested — no further, no less.
+- The top-of-document index correctly reflects every scope present and its deepest tier.
+- No unresolved design decision blocks the tier just written; genuine tradeoffs were asked about instead of guessed.

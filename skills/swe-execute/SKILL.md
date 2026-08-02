@@ -10,14 +10,14 @@ Implement one bounded slice in a clean, repository-aware context; verify it agai
 
 # Inputs and Workspace
 
-Use the `build-spec.md` named by the user, or infer the current change only when unambiguous. When the user names a plan slice, execute that slice. Otherwise continue the current or next unblocked slice from `state.md` and `plan.md`; when no plan exists, treat the build spec as one slice.
+Use the canonical `build-spec.md` named by the user, or infer the current change only when unambiguous. When the change instead used the progressive `swe-spec-new` flow, read `.swe-work/<change>/spec.html` directly as the canonical contract at whatever depth each scope reached; there is no Markdown counterpart to read instead. When the user names a plan slice, execute it from canonical `plan.md`. Otherwise continue the current or next unblocked slice from `state.md` and `plan.md`; when no plan exists, treat the build spec as one slice. Paired HTML files derived from Markdown artifacts are human-review renderings only: do not use them as an implementation source or update them during execution unless the user explicitly asks to revise the underlying contract.
 
 Use `.swe-work/<change>/state.md`, creating it from [state.template.md](state.template.md) when implementation starts. Work in the user-selected branch or worktree and preserve unrelated changes.
 
 # Workflow
 
 1. **Resolve the slice.** Prefer the slice named by the user. Otherwise read `state.md` and `plan.md`, select the current or next unblocked slice, and confirm dependencies are complete. Do not repeat completed work unless the user requests rework.
-2. **Load focused context.** Read the selected slice, its referenced build-spec sections and acceptance criteria, relevant architecture boundaries, repository guidance, relevant spike reports and saved artifacts, and the smallest useful source and tests. Treat spikes as evidence, not permission to override the build spec.
+2. **Load focused context.** Read the selected slice, its referenced canonical Markdown build-spec sections and acceptance criteria, relevant canonical Markdown architecture boundaries, repository guidance, relevant spike reports and saved artifacts, and the smallest useful source and tests. Treat spikes as evidence, not permission to override the build spec.
 3. **Check workspace safety.** Inspect git status and current branch. Preserve unrelated changes. Ask before destructive, hard-to-reverse, externally visible, or production-affecting actions.
 4. **Establish verification.** When practical, add or identify a behavioural check that fails for the missing behaviour before implementation. Do not force test-first work when the repository or change makes it artificial; always define the observable check before declaring completion.
 5. **Implement the slice.** Follow exact shared contracts while choosing simple local implementation details consistent with repository conventions.

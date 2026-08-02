@@ -33,7 +33,7 @@ Use the change directory or `build-spec.md` named by the user. Include `plan.md`
    ```
 
    If creation fails, stop and report the command error before retrying.
-5. **Copy artifacts.** Copy the complete `CHANGE_DIR` to the same repository-relative location inside the worktree, including brief, architecture, build spec, optional plan, state, and every spike report and saved spike artifact.
+5. **Copy artifacts.** Copy the complete `CHANGE_DIR` to the same repository-relative location inside the worktree, including canonical Markdown artifacts, their paired derived HTML review artifacts when present, state, and every spike report and saved spike artifact.
 6. **Verify readiness.** Confirm the new path, branch, copied artifact paths, and clean worktree status.
 
 # Constraints

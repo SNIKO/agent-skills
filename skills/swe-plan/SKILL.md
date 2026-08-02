@@ -6,11 +6,11 @@ disable-model-invocation: true
 
 # Purpose
 
-Decide delivery order and verification boundaries for complex execution. A plan coordinates specified work; it does not repeat low-level design or narrate how to code it.
+Decide delivery order and verification boundaries for complex execution. A plan coordinates specified work; it does not repeat low-level design or narrate how to code it. Produce canonical Markdown for agents plus a derived HTML review artifact for humans only when a plan is justified.
 
 # Inputs and Workspace
 
-Use the `build-spec.md` named by the user, or infer the current change only when unambiguous. Read the brief and architecture only when needed to understand acceptance, dependencies, or risk. Read relevant spike reports and artifacts when they affect sequencing, feasibility, rollout, or an early risk-reduction slice. Write `.swe-work/<change>/plan.md` using [plan.template.md](plan.template.md) only when a separate plan is justified and can be sequenced safely.
+Use the `build-spec.md` named by the user, or infer the current change only when unambiguous. Read the brief and architecture only when needed to understand acceptance, dependencies, or risk. Read relevant spike reports and artifacts when they affect sequencing, feasibility, rollout, or an early risk-reduction slice. When the change instead used the progressive `swe-spec-new` flow, read `.swe-work/<change>/spec.html` directly as the canonical contract at whatever depth it reached; there is no Markdown counterpart to read instead. Write canonical `.swe-work/<change>/plan.md` using [plan.template.md](plan.template.md) only when a separate plan is justified and can be sequenced safely. Then render `.swe-work/<change>/plan.html` using [swe-artifact](../swe-artifact/SKILL.md). Markdown is authoritative; HTML is a static human-review artifact.
 
 # Workflow
 
@@ -21,7 +21,7 @@ Use the `build-spec.md` named by the user, or infer the current change only when
 5. **Reference authoritative detail.** Link each slice to exact build-spec sections and acceptance criteria. Do not copy their contracts.
 6. **Define verification.** Give runnable repository commands and observable results for each slice, including rollback or operational checks only where relevant.
 7. **Check plan size.** If more than roughly eight slices are needed, recommend splitting the change or introducing explicit phases rather than producing a giant plan.
-8. **Complete, skip, or stop.** Write `plan.md` only when a separate plan is justified and fully sequenceable. If no plan is needed, leave no plan artifact. If an upstream gap prevents safe sequencing, report it and do not create or overwrite `plan.md`.
+8. **Complete, skip, or stop.** Write `plan.md` and its derived `plan.html` only when a separate plan is justified and fully sequenceable. If no plan is needed, leave neither plan artifact. If an upstream gap prevents safe sequencing, report it and do not create or overwrite either paired artifact.
 
 # Planning Threshold
 
@@ -70,21 +70,22 @@ Planning must not invent requirements, architecture, contracts, paths, or error 
 
 # Output
 
-If no plan is needed, do not create `plan.md`; report the reason and recommend implementation directly from `build-spec.md` as one slice.
+If no plan is needed, do not create `plan.md` or `plan.html`; report the reason and recommend implementation directly from `build-spec.md` as one slice.
 
-If a plan is needed and can be completed, write `plan.md` and report:
+If a plan is needed and can be completed, write canonical `plan.md`, render `plan.html` from it using `swe-artifact`, and report:
 
 - planning rationale;
 - number and ordering strategy of slices;
 - first risk or capability validated;
+- both artifact paths and that Markdown is canonical;
 - recommended next step, normally `swe-worktree` or `swe-execute`.
 
-If planning is blocked, do not write the artifact; report the upstream gap and revision path.
+If planning is blocked, do not write either paired artifact; report the upstream gap and revision path.
 
 # Completion Criteria
 
 Finish with exactly one outcome:
 
-- **Plan written:** A separate plan is justified; every slice has a coherent outcome, dependencies, spec references, expected areas, and deterministic verification; ordering preserves valid intermediate states; and the artifact contains no duplicated contracts or coding narration.
-- **Plan skipped:** The build spec is one coherent slice, no `plan.md` was created, and the response directs execution to the build spec.
-- **Returned upstream:** The sequencing gap and earliest affected artifact are explicit, and `plan.md` was not created or overwritten.
+- **Plan written:** `plan.md` is a concise, authoritative agent contract; its paired `plan.html` accurately renders the same delivery commitments for direct local review; a separate plan is justified; every slice has a coherent outcome, dependencies, spec references, expected areas, and deterministic verification; ordering preserves valid intermediate states; and the artifact contains no duplicated contracts or coding narration.
+- **Plan skipped:** The build spec is one coherent slice, neither plan artifact was created, and the response directs execution to the build spec.
+- **Returned upstream:** The sequencing gap and earliest affected artifact are explicit, and neither plan artifact was created or overwritten.
