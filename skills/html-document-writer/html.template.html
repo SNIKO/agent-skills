@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>{{Document title}}</title>
+    <style>
+      :root {
+        --paper: #f7f7f5; --surface: #fff; --ink: #17212b; --muted: #56636f;
+        --line: #d8dde1; --accent: #1c5b73; --accent-soft: #e8f2f6;
+        --warning: #6c4e12; --warning-soft: #fff5d9; --code: #eff2f3;
+        --added: #e7f5ea; --removed: #fdebed; --syntax-keyword: #7b3f00;
+        --syntax-string: #0f6b52; --syntax-comment: #6a737d; --syntax-type: #295b9b;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink); background: var(--paper);
+      }
+      * { box-sizing: border-box; }
+      body { min-width: 320px; margin: 0; }
+      main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 48px 0 80px; }
+      header { border-bottom: 1px solid var(--line); padding-bottom: 28px; }
+      .eyebrow, dt, th, .code-label { color: var(--muted); font-size: .73rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+      h1, h2, h3 { color: var(--ink); line-height: 1.15; }
+      h1 { max-width: 820px; margin: 10px 0 12px; font-size: clamp(2.25rem, 5vw, 4.5rem); letter-spacing: -.045em; }
+      h2 { margin: 0 0 18px; font-size: clamp(1.4rem, 2.4vw, 2rem); letter-spacing: -.025em; }
+      h3 { margin: 0 0 8px; font-size: 1rem; }
+      p, li { line-height: 1.65; }
+      .lede { max-width: 760px; color: var(--muted); font-size: 1.1rem; }
+      .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 20px; color: var(--muted); font-size: .9rem; }
+      a { color: var(--accent); text-underline-offset: .16em; }
+      section { padding: 34px 0; border-bottom: 1px solid var(--line); }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+      .grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .card, .callout { min-width: 0; border: 1px solid var(--line); background: var(--surface); padding: 18px; }
+      .callout { border-left: 4px solid var(--accent); background: var(--accent-soft); }
+      .callout--warning { border-left-color: var(--warning); background: var(--warning-soft); }
+      .card > :first-child, .callout > :first-child { margin-top: 0; }
+      .card > :last-child, .callout > :last-child { margin-bottom: 0; }
+      .table-wrap { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+      table { width: 100%; min-width: 640px; border-collapse: collapse; text-align: left; }
+      caption { padding: 12px 14px; color: var(--muted); text-align: left; font-size: .9rem; }
+      th, td { padding: 12px 14px; vertical-align: top; border-bottom: 1px solid var(--line); }
+      tbody tr:last-child td { border-bottom: 0; }
+      td { font-size: .92rem; line-height: 1.5; }
+      code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      :not(pre) > code { overflow-wrap: anywhere; padding: .12em .32em; background: var(--code); }
+      .code-label { margin: 0 0 6px; }
+      pre { overflow-x: auto; margin: 0; padding: 16px; border: 1px solid var(--line); background: var(--code); font-size: .85rem; line-height: 1.55; tab-size: 2; }
+      .tok-keyword { color: var(--syntax-keyword); font-weight: 700; } .tok-string { color: var(--syntax-string); }
+      .tok-comment { color: var(--syntax-comment); font-style: italic; } .tok-number { color: #8c3a80; }
+      .tok-type { color: var(--syntax-type); } .tok-function { color: #7b3f00; } .tok-property { color: #295b9b; }
+      .diff .add, .diff ins { display: block; color: #164b24; background: var(--added); text-decoration: none; }
+      .diff .remove, .diff del { display: block; color: #7a1b29; background: var(--removed); text-decoration: none; }
+      .diff .hunk { color: var(--accent); } .file-tree { white-space: pre; }
+      figure { margin: 20px 0 0; border: 1px solid var(--line); background: var(--surface); }
+      .diagram-frame { max-width: 100%; overflow: auto; padding: 16px; background: var(--code); }
+      .diagram-frame svg { display: block; width: 100%; min-width: 580px; height: auto; }
+      figcaption { padding: 12px 16px; color: var(--muted); font-size: .9rem; line-height: 1.5; }
+      @media (max-width: 720px) {
+        main { width: min(100% - 24px, 1120px); padding-top: 28px; }
+        .grid, .grid--3 { grid-template-columns: minmax(0, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">{{Document type}}</p>
+        <h1>{{Document title}}</h1>
+        <p class="lede">{{A concise, source-supported summary for the intended reader.}}</p>
+        <div class="meta"><span>{{Author, source, version, or date when supplied}}</span></div>
+      </header>
+
+      <!-- Keep only sections and elements that serve the document. Remove all placeholders. -->
+      <section>
+        <p class="eyebrow">Overview</p>
+        <div class="grid grid--3">
+          <article class="card"><h3>{{Key point}}</h3><p>{{Concise explanation}}</p></article>
+          <article class="card"><h3>{{Key point}}</h3><p>{{Concise explanation}}</p></article>
+          <article class="card"><h3>{{Key point}}</h3><p>{{Concise explanation}}</p></article>
+        </div>
+      </section>
+
+      <section>
+        <p class="eyebrow">Diagram</p><h2>{{Diagram title}}</h2>
+        <figure>
+          <div class="diagram-frame">
+            <!-- Use only when a diagram improves understanding. Replace with an accessible inline SVG or remove. -->
+            <svg viewBox="0 0 760 180" role="img" aria-labelledby="diagram-title diagram-desc" xmlns="http://www.w3.org/2000/svg">
+              <title id="diagram-title">{{Diagram title}}</title><desc id="diagram-desc">{{Concise diagram description}}</desc>
+              <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#1c5b73" /></marker></defs>
+              <rect x="30" y="55" width="190" height="70" rx="4" fill="#fff" stroke="#1c5b73" /><text x="125" y="96" text-anchor="middle" font-family="system-ui" fill="#17212b">{{Source}}</text>
+              <path d="M220 90H390" stroke="#1c5b73" stroke-width="2" marker-end="url(#arrow)" />
+              <rect x="410" y="55" width="190" height="70" rx="4" fill="#fff" stroke="#1c5b73" /><text x="505" y="96" text-anchor="middle" font-family="system-ui" fill="#17212b">{{Outcome}}</text>
+            </svg>
+          </div>
+          <figcaption>{{What the diagram shows and any qualification needed to interpret it.}}</figcaption>
+        </figure>
+      </section>
+
+      <section>
+        <p class="eyebrow">Code</p><h2>{{Code example title}}</h2>
+        <p class="code-label">{{language}} · {{optional file path}}</p>
+        <pre><code class="language-ts"><span class="tok-keyword">export</span> <span class="tok-keyword">function</span> <span class="tok-function">example</span>(<span class="tok-property">name</span>: <span class="tok-type">string</span>) {
+  <span class="tok-comment">// Preserve source-supported behavior.</span>
+  <span class="tok-keyword">return</span> <span class="tok-string">`Hello, ${name}`</span>;
+}</code></pre>
+      </section>
+
+      <section>
+        <p class="eyebrow">Change</p><h2>{{Diff title}}</h2>
+        <pre class="diff"><code><span class="hunk">@@ -1,3 +1,3 @@</span>
+<span class="remove">-old value</span>
+<span class="add">+new value</span>
+ unchanged context</code></pre>
+      </section>
+
+      <section>
+        <p class="eyebrow">Structure</p><h2>{{File structure title}}</h2>
+        <pre class="file-tree"><code>{{root}}/
+├── {{directory}}/
+│   └── {{file}}
+└── {{file}}</code></pre>
+      </section>
+
+      <section>
+        <p class="eyebrow">Data</p><h2>{{Schema or structured facts}}</h2>
+        <div class="table-wrap"><table>
+          <caption>{{Entity, relationship, or table purpose}}</caption>
+          <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Null</th><th scope="col">Constraints / notes</th></tr></thead>
+          <tbody><tr><td><code>{{field}}</code></td><td>{{type}}</td><td>{{yes/no}}</td><td>{{PK, FK, index, or source-supported note}}</td></tr></tbody>
+        </table></div>
+      </section>
+
+      <section>
+        <aside class="callout"><p class="eyebrow">Decision / assumption / risk</p><h2>{{Title}}</h2><p>{{Source-supported content.}}</p></aside>
+      </section>
+    </main>
+  </body>
+</html>

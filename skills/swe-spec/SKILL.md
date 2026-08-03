@@ -1,5 +1,5 @@
 ---
-name: swe-spec-new
+name: swe-spec
 description: "Create and progressively deepen design and specification for a change"
 disable-model-invocation: true
 ---
@@ -16,7 +16,7 @@ SPEC_FILE: `{CHANGE_DIR}/spec.html` - the canonical specification artifact, prog
 
 # Tools & Skills
 
-[swe-artifact](../swe-artifact/SKILL.md) - use when generating or updating `{SPEC_FILE}` to produce a human-reviewable HTML artifact from the Markdown content in required style and format.
+[html-document-writer](../html-document-writer/SKILL.md) - use when generating or updating `{SPEC_FILE}` to produce a human-reviewable HTML artifact in the required style and format.
 
 # Workflow
 

@@ -10,7 +10,7 @@ Decide delivery order and verification boundaries for complex execution. A plan 
 
 # Inputs and Workspace
 
-Use the `build-spec.md` named by the user, or infer the current change only when unambiguous. Read the brief and architecture only when needed to understand acceptance, dependencies, or risk. Read relevant spike reports and artifacts when they affect sequencing, feasibility, rollout, or an early risk-reduction slice. When the change instead used the progressive `swe-spec-new` flow, read `.swe-work/<change>/spec.html` directly as the canonical contract at whatever depth it reached; there is no Markdown counterpart to read instead. Write canonical `.swe-work/<change>/plan.md` using [plan.template.md](plan.template.md) only when a separate plan is justified and can be sequenced safely. Then render `.swe-work/<change>/plan.html` using [swe-artifact](../swe-artifact/SKILL.md). Markdown is authoritative; HTML is a static human-review artifact.
+Use the `build-spec.md` named by the user, or infer the current change only when unambiguous. Read the brief and architecture only when needed to understand acceptance, dependencies, or risk. Read relevant spike reports and artifacts when they affect sequencing, feasibility, rollout, or an early risk-reduction slice. When the change instead used the progressive `swe-spec-new` flow, read `.swe-work/<change>/spec.html` directly as the canonical contract at whatever depth it reached; there is no Markdown counterpart to read instead. Write canonical `.swe-work/<change>/plan.md` using [plan.template.md](plan.template.md) only when a separate plan is justified and can be sequenced safely. Then render `.swe-work/<change>/plan.html` using [html-document-writer](../html-document-writer/SKILL.md). Markdown is authoritative; HTML is a static human-review artifact.
 
 # Workflow
 
@@ -72,7 +72,7 @@ Planning must not invent requirements, architecture, contracts, paths, or error 
 
 If no plan is needed, do not create `plan.md` or `plan.html`; report the reason and recommend implementation directly from `build-spec.md` as one slice.
 
-If a plan is needed and can be completed, write canonical `plan.md`, render `plan.html` from it using `swe-artifact`, and report:
+If a plan is needed and can be completed, write canonical `plan.md`, render `plan.html` from it using `html-document-writer`, and report:
 
 - planning rationale;
 - number and ordering strategy of slices;
