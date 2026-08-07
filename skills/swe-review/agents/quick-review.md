@@ -45,21 +45,5 @@ Before returning findings, check that:
 </completion_criteria>
 
 <output>
-Return `<findings></findings>` if no confirmed issue exists. Otherwise return:
-
-```xml
-<findings>
-  <finding>
-    <severity>blocking|warning|suggestion</severity>
-    <category>bug|security|spec|quality|design|docs|release|performance|tests</category>
-    <confidence>high|medium</confidence>
-    <file>path/from/repo</file>
-    <line>changed-line-or-range</line>
-    <title>short specific title</title>
-    <problem>why this is real</problem>
-    <impact>what breaks</impact>
-    <fix>minimal fix</fix>
-  </finding>
-</findings>
-```
+Return `<findings></findings>` if no confirmed issue exists. Otherwise use the required XML finding schema.
 </output>

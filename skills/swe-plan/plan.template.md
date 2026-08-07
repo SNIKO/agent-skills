@@ -1,6 +1,6 @@
 # Delivery Plan: <Change>
 
-**Based on:** [`build-spec.md`](build-spec.md)
+**Based on:** [`spec.html`](spec.html)
 
 ## Delivery strategy
 
@@ -16,8 +16,10 @@
 
 **Spec references:**
 
-- `build-spec.md#<section>`
-- AC-...
+<!-- Section ids from spec.html, so the implementer loads only what this slice needs. -->
+
+- `spec.html#<section-id>`
+- `brief.md` AC-...
 
 **Expected areas:**
 

@@ -18,7 +18,7 @@ Use this mode when documentation alone is insufficient and the question asks wha
 
 # Safety
 
-A user request to probe a public read-only endpoint authorizes that bounded request. Ask before authenticated, paid, mutating, bulk, rate-sensitive, or otherwise consequential requests. Follow provider identification, rate-limit, acceptable-use, and data-retention requirements. Apply the redaction and fixture rules from the top-level Artifact Rules to whatever the probe captures.
+A request to probe a public read-only endpoint authorizes that bounded request under the skill's autonomy policy. Follow provider identification, rate-limit, acceptable-use, and data-retention requirements.
 
 # Suggested Artifact Names
 

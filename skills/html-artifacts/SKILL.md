@@ -1,5 +1,5 @@
 ---
-name: html-document-writer
+name: html-artifacts
 description: "Create or revise polished, standalone HTML documents for direct human reading. Use for technical documents, proposals, reports, specifications, guides, and review artifacts when the user wants a clear, attractive HTML deliverable."
 ---
 

@@ -23,7 +23,7 @@ Read the smallest useful set of:
 - root and nearest `AGENTS.md`;
 - `CLAUDE.md` and relevant `.agents/` rules;
 - PR or issue requirements;
-- `.swe-work/<change>/brief.md`, `architecture.md`, `build-spec.md`, `plan.md`, `state.md`, and relevant `spikes/*/spike.md` reports and saved artifacts when the change references them;
+- `.swe/<change>/brief.md`, `spec.html`, `plan.md`, `state.md`, and the `.swe/research/*/report.md` reports those artifacts link, with saved artifacts when a claim depends on them;
 - package or module documentation directly affected by the diff.
 
 Repository rules override general preferences. Treat unstated requirements as unknown.
@@ -32,7 +32,7 @@ Repository rules override general preferences. Treat unstated requirements as un
 
 For Standard or Comprehensive review, create a temporary directory such as `.tmp/code-review/<context>/<timestamp>/` containing:
 
-- `shared-context.md`: scope, intent, acceptance criteria, repository profile, rules, base/head refs, and selected agents;
+- `shared-context.md`: scope, intent, acceptance criteria, repository profile, rules, base/head refs, selected agents, and the finding schema below;
 - `manifest.tsv`: changed path, status, lines, kind, risk tags, and assigned agents;
 - `diffs/`: one patch per changed file;
 - `agent-inputs/<agent>.md`: only assigned patches and exact surrounding files the agent may inspect.
@@ -89,7 +89,7 @@ Repository rules may de-emphasize a tag, but obvious secret exposure, data loss,
 # Specialist Responsibilities
 
 - **Quick review:** obvious high-confidence issues for tiny changes.
-- **Spec compliance:** selected requirements, acceptance, wiring, scope, architecture, and build-spec contracts.
+- **Spec compliance:** selected requirements, acceptance, wiring, scope, and `spec.html` structure and contracts.
 - **Bugs and regression:** concrete runtime correctness, changed callers, state, failures, and behavioural tests.
 - **Code quality:** maintainability and simplicity within the chosen approach; no preference-only cleanup.
 - **Design:** a fundamentally simpler verified approach, reuse over reinvention, and changed boundary quality.
@@ -131,7 +131,7 @@ For every candidate finding:
 3. Confirm referenced symbols, behaviour, requirements, and repository rules.
 4. Reclassify severity and category when needed.
 5. Remove speculative, convention-only, unrelated, pre-existing, already-handled, or low-confidence findings.
-6. Remove architecture or intent claims unsupported by the provided brief, spec, repository rules, or inspected code.
+6. Remove design or intent claims unsupported by the provided brief, spec, repository rules, or inspected code.
 7. Keep only issues the author would likely correct if shown the evidence.
 8. Prefer tests, broken contracts, changed behaviour, and concrete production or developer impact over theoretical concerns.
 

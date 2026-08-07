@@ -1,7 +1,7 @@
 # Execution State: <Change>
 
 **Updated:** YYYY-MM-DD
-**Build spec:** [`build-spec.md`](build-spec.md)
+**Spec:** [`spec.html`](spec.html)
 **Plan:** [`plan.md`](plan.md) | None
 
 ## Current slice
@@ -27,7 +27,7 @@
 ### <Discovery>
 
 - **Evidence:** ...
-- **Affected artifact:** `brief.md` | `architecture.md` | `build-spec.md` | `plan.md`
+- **Affected artifact:** `brief.md` | `spec.html#<section-id>` | `plan.md`
 - **Impact:** ...
 - **Partial work state:** ...
 - **Recommended action:** ...

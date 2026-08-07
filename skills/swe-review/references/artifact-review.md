@@ -9,9 +9,11 @@ Independently determine whether one SWE artifact is ready for the next human-con
 Review exactly one primary artifact. Read only:
 
 - its authoritative upstream artifacts;
-- relevant spike reports and the saved artifacts needed to verify their claims;
+- the research reports it links, and the saved artifacts needed to verify their claims;
 - repository guidance and source needed to verify material claims;
-- existing architecture or contracts directly affected by the proposal.
+- existing structure or contracts directly affected by the proposal.
+
+For `spec.html`, use its table of contents to scope the review to the sections in question when the user names an area; otherwise review the whole document.
 
 Do not use conversational rationale as a substitute for written evidence. Do not review downstream artifacts unless the user explicitly requests consistency review across them.
 
@@ -37,55 +39,52 @@ Do not use conversational rationale as a substitute for written evidence. Do not
 Consider it ready for the next step when:
 
 - the problem and desired outcome are distinct from the proposed solution;
-- in-scope and out-of-scope behaviour are coherent;
-- acceptance criteria are observable and do not prescribe architecture;
-- repository fit, external feasibility, complexity, risk, and main uncertainty are evidence-backed enough for the decision;
+- excluded behaviour is coherent and the acceptance criteria are the only statement of required behaviour;
+- acceptance criteria are observable and do not prescribe a solution;
+- repository fit, complexity, risk, and main uncertainty are evidence-backed enough for the decision;
 - the delivery depth is proportional to risk and uncertainty;
-- assumptions that block the next step are explicit.
+- assumptions that block the next step are explicit;
+- it fits on one screen.
 
-Flag as blocking when the brief could authorize the wrong product behaviour, relies on an unsupported feasibility claim, or cannot distinguish completion from partial success.
+Apply the boundary test: every statement must still be true if the codebase were rewritten in another language. Flag solution choices, mechanisms, and contracts that have leaked in — especially through Non-negotiables.
 
-## Spike
+Flag as blocking when the brief could authorize the wrong product behaviour, relies on an unsupported feasibility claim, or cannot distinguish completion from partial success. Do not flag a missing in-scope list or a missing required-behaviour section; those are deliberately absent.
+
+## Research report
 
 Consider it complete when:
 
-- it directly answers the user's repository, external-system, feasibility, behaviour, or impact question;
+- it directly answers the repository, external-system, feasibility, behaviour, or impact question;
 - the investigation is broad enough for the claim, including producer and consumer paths for repository-wide impact questions;
 - important repository claims cite paths and symbols;
 - live or experimental claims link sanitized, reproducible scripts and outputs when those artifacts are needed;
 - external claims identify authoritative sources, observation date, representative inputs, and material limitations;
 - facts, interpretations, limitations, and implications are distinguishable;
-- the report is concise while its artifact directory preserves useful detail.
+- `Current understanding` is true today and consistent with the newest finding;
+- superseded findings are marked rather than deleted, and front matter records `updated` and `verified-against`;
+- the subject boundary is coherent — the report is not two unrelated subjects sharing a directory.
 
-Flag shallow text search presented as repository-wide safety, documentation presented as observed runtime behaviour, missing probe artifacts, unreproducible experiments, leaked secrets, unsupported certainty, and a rigid report that obscures the answer.
+Flag shallow text search presented as repository-wide safety, documentation presented as observed runtime behaviour, missing probe artifacts, unreproducible experiments, leaked secrets, unsupported certainty, a stale standing summary contradicted by a later finding, and duplication of a subject that already exists in the corpus.
 
-## Architecture
+## Spec
 
-Consider it ready for low-level specification when:
+`spec.html` spans high-level structure and exact contracts in one document, and different sections legitimately sit at different depths. Review each section **at the depth it claims**, not against a fixed template. A shallow section is not a defect; a shallow section presented as implementable is.
 
-- design drivers trace to the brief or evidence;
-- components have coherent responsibilities, ownership, and reasons to change;
-- dependency direction, orchestration, mutation, state, retries, idempotency, and failure ownership are clear where relevant;
-- normal and architecturally distinct exceptional flows are feasible in the repository;
-- the design was challenged against a credible simpler alternative;
-- conceptual data ownership is sufficient without leaking into exact schema or implementation;
-- no product requirement or low-level contract is silently invented.
+Consider it ready for the next step when:
 
-Flag circular or impossible dependencies, ownerless invariants, coupled responsibilities, missing failure transitions, and premature exact DTO/schema/file design.
-
-## Build spec
-
-Consider it ready for implementation or planning when:
-
-- exact shared, persistent, externally visible, security-sensitive, and operational contracts are complete and internally consistent;
-- existing paths, symbols, commands, and conventions are verified;
-- API, module, event, schema, migration, compatibility, configuration, and failure details are exact where applicable;
+- it reads top-down — overall idea and how the pieces fit before any one part in detail — and is grouped by domain area;
+- structural decisions trace to the brief or to evidence, and no product requirement is silently invented;
+- components have coherent responsibilities, ownership, and reasons to change; dependency direction, mutation, state, retries, idempotency, and failure ownership are clear where relevant;
+- the approach was challenged against a credible simpler alternative;
+- every section that claims exact-contract depth is complete and internally consistent: API, module, event, schema, migration, compatibility, configuration, and failure details are exact, and existing paths, symbols, commands, and conventions are verified;
 - private implementation remains flexible unless an invariant requires precision;
-- acceptance criteria and critical invariants map to deterministic verification;
-- no missing decision prevents implementation;
-- the spec does not repeat product background or architecture narrative.
+- acceptance criteria and critical invariants map to deterministic verification in the sections that are contract-complete;
+- sections do not contradict each other across depths;
+- section ids are stable, the table of contents matches the sections, and local links resolve.
 
-Flag invented repository details, mismatched names or types across seams, unsafe migration states, vague failures, unverifiable acceptance, and implementation-by-prose.
+Flag circular or impossible dependencies, ownerless invariants, coupled responsibilities, missing failure transitions, invented repository details, mismatched names or types across seams, unsafe migration states, vague failure semantics, implementation-by-prose, and private methods or algorithms specified without a correctness, security, or contract reason.
+
+Flag as blocking any place where a deeper section silently reverses a shallower one: that is a decision the human never made.
 
 ## Delivery plan
 
@@ -95,8 +94,8 @@ Consider it executable when:
 - slices deliver complete behaviour or independently useful risk reduction;
 - dependencies are explicit and intermediate states remain valid;
 - early slices reduce important uncertainty or deliver thin end-to-end value;
-- each slice references authoritative spec sections and has deterministic verification;
-- contracts and coding instructions are not duplicated from the build spec;
+- each slice references authoritative `spec.html` section ids and has deterministic verification;
+- contracts and coding instructions are not duplicated from the spec;
 - the plan is small enough to execute and review.
 
 Flag horizontal placeholder layers, unsafe sequencing, future-dependent incomplete tasks, duplicated low-level design, and plans that should be omitted or split.
@@ -124,7 +123,7 @@ Do not report:
 - wording or formatting preferences;
 - missing sections that do not apply;
 - implementation details deliberately owned by a later stage;
-- concerns already resolved by linked authoritative evidence or a credible spike;
+- concerns already resolved by linked authoritative evidence or a credible research report;
 - speculative scale, security, or compatibility requirements not established by context.
 
 # Assessment
@@ -138,7 +137,7 @@ Do not report:
 ```markdown
 ## Artifact Review — `<path>`
 
-**Type:** Brief | Spike | Architecture | Build spec | Delivery plan | Execution state
+**Type:** Brief | Research report | Spec | Delivery plan | Execution state
 **Assessment:** Ready | Revise | Return upstream
 
 ### Summary
