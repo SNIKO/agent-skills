@@ -1,41 +1,32 @@
 # OpenAI Prompt Writer
 
-Use this reference for OpenAI prompts. Keep prompt artifacts clear, compact, task-specific, easy to evaluate, and explicit about success criteria and evidence. Prefer outcome-first prompts with light process unless the process is truly required.
+Use this reference when writing, reviewing, or revising prompts for OpenAI models (GPT-5.x, including GPT-5.6).
 
-## Core Rule
+If the prompt's purpose or use context is unclear, ask the smallest question needed: what the prompt will be used for and what output it must produce. Otherwise infer from the user request, surrounding artifact, or repository context.
 
-If the prompt's purpose or use context is unclear, ask the smallest question needed: what the prompt will be used for and what kind of output it must produce. Otherwise, infer from the user request, surrounding artifact, or repository context.
+Stay inside prompt text: structure, wording, formats, examples, context boundaries, output contract, evidence rules, and validation. Do not add API calls, SDK snippets, model IDs, runtime parameters, or product claims unless the user asks for them or they belong in the prompt.
 
-## Scope
+## Leanness
 
-Focus on prompt writing:
+Lean prompts outperform long ones. Removing repeated instructions, redundant examples, and bloated tool descriptions improves task performance while cutting tokens, latency, and cost. Treat prompt length as a cost, not as thoroughness.
 
-- structure and section order
-- wording and instruction priority
-- Markdown, XML tags, JSON schemas, or other text formats
-- examples and counterexamples
-- dynamic context boundaries
-- output shape, style, and stop conditions
-- personality, collaboration style, and response-length instructions
-- retrieval budgets, citation rules, and missing-evidence behavior
-- validation loops and task-specific checks
-- cache-friendly placement of stable prompt text
+- State each instruction exactly once, in one place. Do not restate a rule across `Role`, `Instructions`, and `Output Format`, and never repeat a rule for emphasis.
+- Start from a prompt and tool set that already works. Remove one group of instructions, examples, or tools at a time, then re-run the same evaluation on representative tasks.
+- Expose only tools relevant to the task, with concise, precise descriptions.
+- Keep examples and style guidance only when they encode a product requirement or correct a measured gap.
+- Repeated prompt and tool content is re-paid every turn and amplified in long sessions.
+- When reviewing an existing prompt, name duplicated rules and delete them rather than rewording them.
 
-Do not add API calls, SDK snippets, model IDs, runtime parameters, or product claims unless the user specifically asks for them or they are part of the prompt text.
+Gains are directional. Recommend validating on the user's own representative tasks rather than asserting fixed numbers.
 
 ## Workflow
 
-1. Identify the prompt type: simple task, structured output, long-context, developer or system prompt, agent prompt, reusable template, eval prompt, skill prompt, grounded or retrieval prompt, creative drafting prompt, or frontend prompt.
-2. Extract the intended task, user-visible outcome, audience, constraints, input sources, evidence needs, output format, validation options, and failure cost.
+1. Identify the prompt type from the patterns below.
+2. Extract the intended task, user-visible outcome, audience, constraints, input sources, evidence needs, output format, and failure cost.
 3. Choose the lightest structure that makes the prompt reliable.
-4. Put stable reusable instructions and stable examples before volatile user input, retrieved context, or examples that change often.
-5. Separate instructions from data with Markdown sections or XML tags when boundaries matter.
-6. Use strict words such as `must`, `never`, `only`, and `always` only for true invariants.
-7. Add personality and collaboration instructions only when they shape the user experience; keep them short and separate from task rules.
-8. Add examples only when they clarify format, tone, classification boundaries, edge cases, or tool behavior.
-9. Add retrieval budgets, citation rules, and missing-evidence behavior when answers need grounding.
-10. Add validation instructions when the output can be checked against explicit success criteria.
-11. Remove duplicated rules, decorative persona text, vague quality claims, chain-of-thought requests, and process narration that does not change behavior.
+4. Place stable instructions and examples before volatile input; separate instructions from data with Markdown sections or XML tags when boundaries matter.
+5. Add autonomy boundaries, evidence rules, examples, tone, length, and validation only where they change behavior.
+6. Delete duplicated rules, decorative persona text, vague quality claims, chain-of-thought requests, and process narration.
 
 ## Common Structure
 
@@ -56,25 +47,25 @@ Use this order for medium or complex prompts, omitting sections that do not matt
 - [Evidence, constraint, or quality bar]
 
 # Instructions
-[Decision rules and task behavior. Prefer destination and constraints over unnecessary process.]
+[Decision rules and task behavior. Prefer destination and constraints over process.]
 
 # Examples
-[Use only when examples materially improve reliability.]
+[Only when they materially improve reliability.]
 
 # Output Format
 [Format, fields, length, order, tone, and required labels.]
 
 # Completion Criteria
-[When to answer, ask, retry, fallback, abstain, validate, or stop.]
+[When to answer, ask, retry, fall back, abstain, validate, or stop.]
 ```
 
-For short prompts, compress the same information into one paragraph or a few bullets. Do not force a large template onto a simple task.
+For short prompts, compress the same information into a paragraph or a few bullets.
 
 ## Prompt Type Patterns
 
-### Simple Task Prompt
+### Simple Task
 
-Use for one-step writing, summarization, classification, transformation, or direct answers:
+One-step writing, summarization, classification, transformation, or direct answers:
 
 ```text
 Summarize the transcript for a product manager deciding next steps.
@@ -90,9 +81,9 @@ Transcript:
 </transcript>
 ```
 
-### Structured Output Prompt
+### Structured Output
 
-Use for extraction, classification, comparison, grading, or deterministic formatting:
+Extraction, classification, comparison, grading, or deterministic formatting:
 
 ```text
 # Role
@@ -104,7 +95,7 @@ Perform [operation] on every item in the input.
 # Rules
 - Apply these rules to every item, not only the first item.
 - If information is missing, use [explicit fallback such as null, unknown, or a short explanation].
-- Do not infer facts that are not supported by the input.
+- Do not infer facts unsupported by the input.
 
 # Output Format
 Return [JSON/table/bullets/prose] with these fields in this order:
@@ -115,52 +106,18 @@ Return [JSON/table/bullets/prose] with these fields in this order:
 {{INPUT}}
 ```
 
-When JSON or another machine-readable schema is required, specify required keys, allowed values, null behavior, ordering, and whether extra keys are allowed.
-
-### Long-Context Prompt
-
-Place stable instructions before dynamic source material when reusable prompt caching matters. Use clear source identifiers:
-
-```text
-# Task
-Answer the final question using the supplied documents.
-
-# Evidence Rules
-- Use only the documents unless outside knowledge is explicitly allowed.
-- Cite the source identifier for each important claim.
-- Compare sources when claims conflict.
-- Treat unsupported claims as unknown.
-
-# Documents
-<documents>
-  <document index="1">
-    <source>...</source>
-    <document_content>
-    ...
-    </document_content>
-  </document>
-</documents>
-
-# Question
-...
-```
-
-If source material is very large, keep metadata close to each source and make the final request easy to find.
-
 ### Developer Or System Prompt
 
-Use when writing persistent behavior for an assistant or application:
+Persistent behavior for an assistant or application:
 
-- Start with identity and purpose.
-- Define authority boundaries and what user input can configure.
-- Separate core behavior, constraints, evidence rules, personality, collaboration style, and output policy.
+- Start with identity and purpose, then authority boundaries and what user input may configure.
+- Separate core behavior, constraints, evidence rules, tone, and output policy.
 - State how to handle missing context, unsafe requests, conflicts, and unsupported claims.
-- Keep stable policy text before variable product data or conversation context.
-- Write persistent application rules as developer/system prompt text, separate from user-provided task input.
+- Keep persistent application rules in developer/system text, separate from user-provided task input.
 
 ### Agent Prompt
 
-Use when the model can plan, use tools, edit files, search, or run multi-step workflows:
+For models that plan, use tools, edit files, search, or run multi-step workflows:
 
 ```text
 # Role
@@ -170,29 +127,32 @@ You are [specific agent role].
 State the concrete end state.
 
 # Context
-Include user goals, repo/product/domain constraints, audience, and known inputs.
+User goals, repo/product/domain constraints, audience, known inputs.
 
 # Operating Rules
-- Investigate before making claims about unseen files, documents, data, or external facts.
-- Use tools when they are needed to verify facts, inspect state, or complete the task.
+- Investigate before making claims about unseen files, data, or external facts.
 - Run independent tool calls in parallel; run dependent steps sequentially.
-- Continue until the user's concrete goal is handled or a real blocker is reached.
-- Ask for confirmation before destructive, hard-to-reverse, or externally visible actions.
+- Continue until the goal is handled or a real blocker is reached.
 - Keep changes focused on the requested task.
 
+# Autonomy And Approvals
+[One compact policy; see "Autonomy And Approval Boundaries".]
+
 # Progress Updates
-Describe when and how to update the user during longer work.
+When and how to update the user during longer work.
 
 # Completion Criteria
-Define what done means, including validation or tests when relevant.
+What done means, including validation or tests.
 
 # Final Response
-Specify the final answer format and what evidence or file references to include.
+Final answer format and required evidence or file references.
 ```
 
-### Reusable Prompt Template
+For tool-heavy streaming workflows, ask for a short preamble before tool calls stating the first step. Add TODO tracking or a rubric only when the agent would otherwise drop steps in complex work.
 
-Put reusable instructions first and volatile variables later under clear labels:
+### Reusable Template
+
+Reusable instructions first, volatile variables last under clear labels:
 
 ```text
 # Task
@@ -208,73 +168,124 @@ Rewrite `{{source_text}}` for `{{audience}}` while preserving the original claim
 
 ### Eval Prompt
 
-Use when asking a model to grade, classify, compare, or judge another output:
-
-- Define the exact rubric and scoring scale.
-- Make labels mutually exclusive when possible.
-- Specify evidence requirements: quote or cite the evaluated text when judging failures.
+- Define the exact rubric and scoring scale; make labels mutually exclusive where possible.
+- Require quoting or citing the evaluated text when judging failures.
 - Include tie-breakers and abstain rules.
-- Keep the final output structured enough to parse or compare.
-- Include representative examples and regression cases when prompt behavior will be compared across model or prompt versions.
+- Keep output structured enough to parse or compare.
+- Include representative and regression cases when behavior is compared across model or prompt versions.
 
 ### Skill Prompt
 
-Use when writing a skill consumed by another agent:
+Skills consumed by another agent:
 
 ```text
 # Purpose
-Define the narrow capability the skill provides.
+The narrow capability the skill provides.
 
 # Trigger
-State exactly when the skill should be used.
+Exactly when the skill should be used.
 
 # Workflow
-List the steps the agent should follow.
+Steps the agent follows.
 
 # Decision Rules
-Describe how to choose between valid prompt structures or approaches.
+How to choose between valid approaches.
 
 # Constraints
-State boundaries, exclusions, and failure behavior.
+Boundaries, exclusions, failure behavior.
 
 # Output
-Specify what the agent should produce for the user.
+What the agent produces for the user.
 ```
 
-Put trigger behavior in the frontmatter description, not only the body. Keep the body procedural and concise. Move large variant-specific details to references only when they are needed.
+Put trigger behavior in the frontmatter description, not only the body. Keep the body procedural; move variant-specific detail to references only when needed.
 
 ### Grounded Or Retrieval Prompt
 
-Use when the answer must rely on external, retrieved, or provided evidence:
-
-- State which claims require citations, such as policies, dates, prices, statistics, named owners, product capabilities, legal or medical guidance, and source-specific facts.
-- Define what counts as enough evidence for the task.
-- Add a retrieval budget: start with the smallest useful search or source read, search again only when required facts are missing or the user asks for exhaustive coverage.
-- Treat missing evidence as unknown, not as proof that a claim is false.
-- Ask for the smallest missing field when evidence is required and unavailable.
-- Stop once the answer can support the core request with useful evidence and citations.
+- State which claims require citations: policies, dates, prices, statistics, named owners, product capabilities, legal or medical guidance, source-specific facts.
+- Define what counts as enough evidence.
+- Set a retrieval budget: start with the smallest useful search, search again only when required facts are missing or the user asks for exhaustive coverage, and stop once the core request is supported.
+- Treat missing evidence as unknown, not as disproof; ask for the smallest missing field when required evidence is unavailable.
 
 ### Creative Drafting Prompt
 
-Use when creating slides, copy, summaries for sharing, talk tracks, launch notes, or narrative framing:
+Slides, copy, shareable summaries, talk tracks, launch notes, narrative framing:
 
 - Distinguish source-backed facts from creative wording.
-- Require retrieved or provided facts for concrete product, customer, metric, roadmap, date, capability, competitive, or outcome claims.
-- Do not invent names, first-party data, metrics, roadmap status, customer outcomes, or capabilities for polish.
-- If support is thin, write a useful generic draft with placeholders or clearly labeled assumptions.
+- Require retrieved or provided facts for product, customer, metric, roadmap, date, capability, competitive, or outcome claims.
+- Never invent names, first-party data, metrics, roadmap status, customer outcomes, or capabilities for polish.
+- If support is thin, draft generically with placeholders or labeled assumptions.
 
 ### Frontend Prompt
 
-Use when writing prompts for frontend generation or UI changes:
-
-- Include product context, target user, design-system constraints, expected states, interaction behavior, accessibility, responsive behavior, and visual inspection requirements.
-- Ask for familiar controls, icons, and existing component patterns where relevant.
-- Avoid generic heroes, nested cards, decorative gradients, visible instructional text, and layouts that have not been rendered or inspected.
+- Include product context, target user, design-system constraints, expected states, interaction behavior, accessibility, and responsive behavior.
+- Ask for familiar controls, icons, and existing component patterns.
+- Avoid generic heroes, nested cards, decorative gradients, and visible instructional text.
 - Require rendering or screenshot inspection before finalizing when the environment can run the UI.
 
-## Formatting Guidance
+## Autonomy And Approval Boundaries
 
-Use Markdown headings and bullets for instruction hierarchy. Use XML tags for separating large or mixed data blocks:
+Current models are proactive and persistent on multi-step tasks. State what level of action each request authorizes so the agent continues safe, in-scope work without unnecessary pauses and stops before external, destructive, costly, or scope-expanding actions.
+
+A compact policy is usually sufficient:
+
+```text
+For requests to answer, explain, review, diagnose, or plan, inspect the relevant
+materials and report the result. Do not implement changes unless the request also
+asks for them.
+
+For requests to change, build, or fix, make the requested in-scope local changes
+and run relevant non-destructive validation without asking first.
+
+Require confirmation for external writes, destructive actions, purchases, or a
+material expansion of scope.
+```
+
+- Name safe local actions explicitly: reading files, inspecting logs, editing in-scope code, running tests.
+- Keep the policy in one place. Do not sprinkle "ask first", "do not mutate", or "wait for approval" elsewhere; repetition triggers unnecessary approval requests for safe, expected actions.
+- The read-only-versus-change distinction, not a global confirmation rule, is what prevents unwanted edits.
+
+## Length And Tone
+
+Current models are concise by default. Do not add broad brevity instructions such as "Be concise" or "Keep it short" by reflex; they are often unnecessary and can make responses too brief. Keep them only when they reliably produce the output the application needs, and when migrating an older prompt, delete the ones that no longer earn their place.
+
+When a task calls for a shorter answer, say what it must preserve and what it may drop rather than only naming a length:
+
+```text
+Lead with the conclusion. Include the evidence needed to support it, any material
+caveat, and the next action. Omit secondary detail and repetition.
+
+Keep all required facts, decisions, caveats, and next steps. Trim introductions,
+repetition, generic reassurance, and optional background first.
+```
+
+Broad tone labels such as "friendly", "empathetic", or "professional" are ambiguous. Describe the writing choices instead:
+
+```text
+State the answer directly. If the user reports a problem, acknowledge the
+specific issue before giving the next step. Use reassurance only when it is
+relevant. Omit generic praise and unnecessary sign-offs.
+```
+
+## High-Effort And Pro Mode
+
+Extra model work is runtime configuration, not prompt text. Under pro mode or higher reasoning effort, keep the same outcome-focused prompt used in standard mode: goal, context, constraints, required evidence, success criteria, output format.
+
+- Never add "use pro mode", "think harder", "reason step by step", or "generate several candidates and pick the best".
+- Reserve higher-effort configurations for tasks where a marginal quality gain materially changes the outcome: complex optimization, high-value coding or review, deep analysis with clear evaluation criteria. Prefer standard mode for routine, latency-sensitive, or high-volume work.
+- Reasoning effort and execution mode are independent. Start from the standard-mode baseline and compare configurations on representative tasks rather than assuming highest effort is best.
+- Make evaluation criteria explicit so the extra work has something to optimize against:
+
+```text
+Review this database migration plan for failure modes that could cause data loss
+or extended downtime. For each finding, cite the relevant step, estimate impact
+and likelihood, and recommend a specific mitigation. Return the five most
+important risks in severity order.
+```
+
+## Formatting And Placement
+
+Use Markdown headings and bullets for instruction hierarchy, and XML tags to separate large or mixed data blocks:
 
 ```text
 <policy>
@@ -286,67 +297,40 @@ Use Markdown headings and bullets for instruction hierarchy. Use XML tags for se
 </user_request>
 ```
 
-Use JSON or schema-like blocks only when the output must be machine-readable. When JSON is required, specify required keys, allowed values, null behavior, and whether extra keys are allowed.
+Use JSON or schema blocks only when output must be machine-readable; then specify required keys, allowed values, ordering, null behavior, and whether extra keys are allowed.
+
+For reusable prompts, order text so the stable prefix stays constant across calls:
+
+1. Identity, objective, standing rules, style, output contract.
+2. Stable domain context, policies, examples.
+3. Variable task inputs, retrieved context, conversation snippets, user data.
+
+Keep frequently changing values out of the stable block and label dynamic content near the end.
 
 ## Wording Rules
 
-- Prefer affirmative instructions: say what to do before saying what to avoid.
-- Make each instruction observable or behavior-changing.
-- Replace "be helpful", "be professional", and "be accurate" with concrete behavior.
+- Prefer affirmative instructions: say what to do before what to avoid.
+- Make each instruction observable or behavior-changing. Replace "be helpful", "be professional", "be accurate" with concrete behavior or delete them.
 - Use `must`, `never`, `only`, and `always` only for true invariants.
-- Use examples to teach boundaries, not to pad the prompt.
-- Avoid chain-of-thought or hidden reasoning requests. Ask for concise rationale, checks, or evidence when they should be visible.
-- Preserve the user's required terminology, voice, and domain constraints unless they weaken correctness.
-- Avoid legacy prompt stacks that over-specify process; add process only when it improves correctness, safety, compliance, tool use, or validation.
-
-## Examples
-
-Use examples when format, tone, edge cases, or classification boundaries matter. Good examples are relevant, diverse, concise, and stable. Avoid examples that accidentally teach unwanted patterns.
-
-## Cache-Friendly Arrangement
-
-When a prompt will be reused, arrange the text so stable content changes least often:
-
-1. Identity, objective, standing rules, style, and output contract.
-2. Stable domain context, policies, and examples.
-3. Variable task inputs, retrieved context, conversation snippets, or user data.
-
-Do not mix frequently changing values into the stable instruction block. Put dynamic content under clear labels near the end so reusable prompt prefixes remain consistent across calls.
-
-## Provider-Specific Notes
-
-- Prefer compact, outcome-first prompt text with explicit success criteria.
-- Keep process light unless it improves correctness, safety, compliance, tool use, or validation.
-- For persistent application behavior, separate developer/system instructions from user-provided task input.
-- For longer or tool-heavy streaming workflows, ask for a short preamble before tool calls that acknowledges the request and states the first step.
-- Include TODO tracking or a rubric only when it helps the agent avoid missing complex multi-step work.
-
-## References
-
-No additional provider reference files are required for the common OpenAI patterns in this skill.
+- Use examples to teach format, tone, edge cases, and classification boundaries — not to pad. Good examples are relevant, diverse, concise, and stable, and never teach patterns you do not want.
+- Avoid chain-of-thought or hidden reasoning requests; ask for concise rationale, checks, or evidence when they should be visible.
+- Preserve the user's terminology, voice, and domain constraints unless they weaken correctness.
+- Add process only when it improves correctness, safety, compliance, tool use, or validation.
 
 ## Output Rules
 
-When responding to the user:
-
-- Provide the finished prompt first.
-- Include a short note only when it helps explain important structure choices.
-- Preserve placeholders such as `{{INPUT}}`, `{{DOCUMENTS}}`, or `{{USER_GOAL}}` when the prompt is meant to be reusable.
+- Provide the finished prompt first, then a short note only if it explains an important structure choice.
+- Preserve placeholders such as `{{INPUT}}`, `{{DOCUMENTS}}`, or `{{USER_GOAL}}` in reusable prompts.
 - Do not invent operational details that belong outside the prompt.
-- If revising an existing prompt, keep the user's intended behavior unless it conflicts with OpenAI prompt-writing best practices or the user's current request.
+- When revising, keep the user's intended behavior unless it conflicts with this reference or the current request.
 
 ## Quality Check
 
-Before finalizing a prompt, verify:
-
-- The intended use and prompt type are clear.
-- The desired outcome appears before detailed process.
-- The output contract is specific enough for the task.
-- Context boundaries are explicit.
-- Scope is explicit when rules apply across every item, source, example, file, step, tool call, or output section.
-- Evidence, retrieval budget, citation rules, and missing-evidence behavior are defined when grounding is required.
-- Personality, collaboration style, and length guidance are explicit when they matter and absent when they do not.
-- Stable instructions appear before volatile inputs when the prompt is reusable.
-- Examples, if present, are necessary and representative.
-- Stop rules and validation checks are present when the task can otherwise loop, over-search, or produce unverifiable output.
-- Instructions do not conflict, duplicate each other, or mix hard invariants with discretionary judgment calls.
+- Every instruction appears exactly once, and every instruction, example, and exposed tool changes behavior.
+- The desired outcome appears before process, and the output contract is specific enough for the task.
+- Rule scope is explicit when rules apply across every item, source, file, step, or output section.
+- Autonomy boundaries are stated once and name safe local actions; tone is described as writing choices; length guidance says what to preserve.
+- Evidence, retrieval budget, citation rules, and missing-evidence behavior exist when grounding is required.
+- Stop rules and validation exist when the task could loop, over-search, or produce unverifiable output.
+- Stable instructions precede volatile inputs in reusable prompts.
+- No instruction conflicts with another, and no runtime concern (verbosity, effort, execution mode) is smuggled into prompt text.
