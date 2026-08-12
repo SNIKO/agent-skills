@@ -148,32 +148,47 @@ Verdict:
 - **Request changes:** Any blocking issue, multiple warnings forming a risk pattern, or confirmed production, security, data, contract, or release risk.
 
 # Output Format
-
 ```markdown
-## Code Review — <scope description>
+## 🤖 Code Review — {PR title or changes scope description}
 
-**Verdict:** Approve | Approve with suggestions | Request changes
-**Tier:** Quick | Standard | Comprehensive
-**Agents:** <agents run>
+**Verdict:** ✅ Approve | 🟡 Approve with suggestions | 🔴 Request changes  
+**Tier:** {Quick|Standard|Comprehensive}  
+**Agents:** {comma-separated agents run}
 
 ### Summary
-<Two or three sentences covering scope and verdict.>
+{2–3 sentences: scope, tier used, and overall verdict. Mention skipped material agents only if helpful.}
 
 ### Findings
 
-No confirmed findings.
+✅ No confirmed findings. {use only when there are no findings}
 
-<!-- Otherwise list all findings in severity order. -->
+{Otherwise list all findings in severity order: blocking first, then warnings, then suggestions. Do not group under severity headings.}
 
-**B1 · <Category> · <Title>**
-`<file>:<line-range>` · **Confidence:** High | Medium
+**{severity_emoji} {ID} · {category_emoji} {Category} · {Title}**
+`{file}:{line-range}` · **Confidence:** {High|Medium}
 
-<Why this is a verified problem and its impact.>
+{Why this is a real problem in the changed behavior. Include concrete impact.}
 
-**Fix:** <Minimal actionable direction.>
+**Fix:** {minimal actionable fix direction.}
+
+---
 ```
 
-Use `B<n>`, `W<n>`, and `S<n>` IDs for blocking, warning, and suggestion findings.
+ID and severity emoji rules:
+- Blocking: `🔴 B{n}`
+- Warning: `🟡 W{n}`
+- Suggestion: `🔵 S{n}`
+
+Category emojis:
+- 🐛 Bug
+- 🔐 Security
+- 📋 Spec
+- 🧹 Quality
+- 🏗️ Design
+- 📚 Docs
+- 🚀 Release
+- ⚡ Performance
+- 🧪 Tests
 
 # Completion Criteria
 

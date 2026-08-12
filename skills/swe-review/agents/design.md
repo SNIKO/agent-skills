@@ -29,6 +29,8 @@ Work in this order and stop as soon as the evidence is clear:
 
 <checks>
 
+Flag only when you can name the specific alternative, point to where it exists or how it would look, and show the concrete win. If you cannot, do not flag.
+
 ## Reinvention of existing solutions
 - Hand-rolled logic that duplicates an existing repo helper, utility, base class, or established pattern.
 - Custom implementation of something a current dependency or the standard library already provides (parsing, retries, collections, date/time, serialization, validation, etc.).
@@ -42,7 +44,17 @@ Work in this order and stop as soon as the evidence is clear:
 ## Inconsistency with how the repo solves this
 - The change reinvents an approach the repo already standardizes elsewhere, increasing divergence for no stated reason.
 
-Flag only when you can name the specific alternative, point to where it exists or how it would look, and show the concrete win. If you cannot, do not flag.
+## Contract and ownership boundaries
+For every changed public or cross-module interface, result type, callback, event,
+or exception contract:
+- Trace each returned value from its producer to all direct consumers.
+- Verify that responsibility stays with the component that owns the relevant knowledge, state, and decision rules.
+- Flag consumers that must infer, reconstruct, or duplicate producer-owned decisions from low-level details.
+- Verify that the contract expresses its outcomes clearly, including normal, failure, empty, partial, and retryable states where applicable.
+- Verify that returned data is sufficient for required downstream actions, without exposing implementation details that force consumers to understand producer internals.
+- Verify that success and failure states cannot be contradictory or ambiguous.
+- A proposed correction may introduce a small new contract type when it materially improves ownership, clarity, or correctness; it need not reuse an existing repository type.
+
 </checks>
 
 <what_not_to_flag>
