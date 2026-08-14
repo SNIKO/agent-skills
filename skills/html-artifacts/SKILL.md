@@ -38,6 +38,14 @@ This skill is document-type neutral. It presents supplied content clearly; it do
 - Do not depend on Mermaid, a CDN, JavaScript, or another runtime renderer. Do not paste unrendered Mermaid source as the only diagram.
 - Caption the diagram with what it shows and preserve any important source qualification. Keep oversized diagrams in a labelled, locally scrollable frame rather than letting them overflow the page.
 
+## Logic and procedure explanations
+
+- Use a numbered, disclosure-based list for a fixed, multi-step algorithm, pipeline, or lookup/decision procedure — especially past four or five steps, or when steps mix ordered actions with guardrails, branches, or exclusions. Use an ordinary numbered list instead when there are only a few steps or nothing worth hiding.
+- Build each step as a native `<details>` element: a numbered `<summary>` giving the step's short outcome, and the full explanation inside. This needs no JavaScript — disclosure is native HTML behavior — and the sequence still reads correctly as a flat list if CSS fails to load.
+- Open the step a first-time reader needs by default (usually step 1, or the happy path); leave the rest collapsed so the whole procedure stays scannable at a glance before the reader opens anything.
+- Keep the visible step number inside `<summary>` rather than relying on list-marker numbering, since removing the native disclosure triangle also removes any list-style marker.
+- Pull cross-cutting guarantees, edge cases, and failure or atomicity behavior out of the step list into `callout`s placed after it, rather than repeating them inside every step.
+
 ## Code and syntax highlighting
 
 - Put executable or copyable code in `pre > code`; set a language class such as `language-ts`, `language-sql`, or `language-json` when known.
@@ -53,15 +61,19 @@ This skill is document-type neutral. It presents supplied content clearly; it do
 
 ## File structure
 
-- Present a repository or directory layout in a labelled `pre.file-tree` block with a monospace tree. Keep paths relative to a clearly named root.
+- Present a repository or directory layout as a labelled tree with a clearly named root. When no path has a per-file change status to show, use a `pre.file-tree` monospace block. When the tree must show which files were added, changed, or removed, use a nested tree of folder and file rows instead: bold folder names read as structure, regular-weight file names read as content, so the two don't compete for attention.
+- Give each file's status a semantic tag plus color, not color alone: render an added file's name as `ins`, a removed file's name as `del` (native underline/strikethrough), and a changed file's name in italics; pair each with a consistent status color (for example added green, changed amber, removed red). Do not add a status letter/badge or a per-folder change-count summary — the file name's own styling is the status indicator.
+- Give a changed, added, or removed file a short one-line reason for the change in a de-emphasized note beside its name, not a line-count delta. Leave an unchanged file's row without a note when it is shown only for structural context.
 - Include only material files and directories. Annotate entries briefly only when their role is not apparent from the name.
-- Distinguish proposed, changed, and existing paths in nearby prose or a legend; do not imply a path exists when it is only illustrative or planned.
+- Distinguish proposed, changed, and existing paths in nearby prose when a per-file status tree is not used; do not imply a path exists when it is only illustrative or planned.
 
 ## Database schema
 
-- Use a table for each entity or relation with columns appropriate to the supplied detail, normally: field, type, nullability, default, constraints/indexes, and notes.
-- State primary keys, foreign keys, unique constraints, indexes, cardinality, delete/update behavior, and migration qualification when known. Mark unspecified details as unspecified rather than guessing.
-- Add a relationship diagram only when it improves on the tables. Keep logical models distinct from physical database details.
+- Present each table or entity as its own card: a header with the table name and a one-line purpose, then a compact column table (column, type, nullability, key) inside it. Use one card per table instead of one long table per entity whenever there is more than one entity, so a reader can scan table boundaries at a glance.
+- Mark primary keys, foreign keys, and unique constraints with a small badge in the card's Key column rather than prose. State cardinality, delete/update behavior, indexes, and migration qualification in nearby text or the relationships table below when known. Mark unspecified details as unspecified rather than guessing.
+- Color-code the Type column by category (string, number, boolean, date/time, UUID, JSON, or similar) so a reader can spot a column's kind without reading every cell. Keep the same category-to-color mapping consistent across every table card in the document.
+- List cross-table relationships (foreign key → referenced key, and cardinality) in one relationships table below the cards rather than repeating them inside every card.
+- Add a relationship diagram only when it improves on the cards and relationships table. Keep logical models distinct from physical database details.
 
 ## Tables
 

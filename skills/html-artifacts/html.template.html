@@ -36,6 +36,36 @@
       .callout--warning { border-left-color: var(--warning); background: var(--warning-soft); }
       .card > :first-child, .callout > :first-child { margin-top: 0; }
       .card > :last-child, .callout > :last-child { margin-bottom: 0; }
+      .steps { display: grid; gap: 10px; }
+      .steps details { border: 1px solid var(--line); background: var(--surface); }
+      .steps details[open] { border-color: var(--accent); }
+      .steps summary { cursor: pointer; list-style: none; padding: 14px 18px; display: flex; align-items: center; gap: 12px; font-weight: 600; }
+      .steps summary::-webkit-details-marker { display: none; }
+      .steps summary .step-num { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+      .steps summary .chevron { margin-left: auto; color: var(--muted); font-size: .8rem; transition: transform .15s ease; }
+      .steps details[open] summary .chevron { transform: rotate(90deg); }
+      .steps summary .step-outcome { color: var(--muted); font-weight: 400; font-size: .87rem; }
+      .steps .step-body { padding: 0 18px 16px 56px; }
+      .steps .step-body > :first-child { margin-top: 0; }
+      .steps .step-body > :last-child { margin-bottom: 0; }
+      .schema-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+      .scard { min-width: 0; border: 1px solid var(--line); background: var(--surface); }
+      .scard > header { padding: 12px 16px; border-bottom: 1px solid var(--line); background: #fafafa; }
+      .scard > header h3 { margin: 0; font-size: .95rem; }
+      .scard > header p { margin: 3px 0 0; color: var(--muted); font-size: .82rem; }
+      .scard table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+      .scard th { text-align: left; padding: 6px 14px; font-size: .66rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border-bottom: 1px solid var(--line); }
+      .scard td { padding: 6px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      .scard tbody tr:last-child td { border-bottom: 0; }
+      .scard .fieldname { font-family: ui-monospace, monospace; font-weight: 600; }
+      .key-badge { display: inline-block; font-size: .64rem; font-weight: 700; letter-spacing: .02em; padding: 1px 6px; border-radius: 3px; }
+      .key-badge.pk { background: var(--accent); color: #fff; }
+      .key-badge.fk { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+      .key-badge.uq { background: #efe6f7; color: #5b2f8c; border: 1px solid #d9c4ec; }
+      .dtype { font-family: ui-monospace, monospace; font-size: .78rem; padding: 1px 6px; border-radius: 3px; white-space: nowrap; }
+      .dtype-string { background: #eaf5ee; color: #1f6b3d; } .dtype-number { background: #fdeee0; color: #9a4a10; }
+      .dtype-boolean { background: #fff2d6; color: #8a5e00; } .dtype-date { background: #e6f6f7; color: #14707a; }
+      .dtype-uuid { background: #eef0ff; color: #3a3fa0; } .dtype-json { background: #f6e9ee; color: #9a2c58; }
       .table-wrap { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
       table { width: 100%; min-width: 640px; border-collapse: collapse; text-align: left; }
       caption { padding: 12px 14px; color: var(--muted); text-align: left; font-size: .9rem; }
@@ -52,6 +82,16 @@
       .diff .add, .diff ins { display: block; color: #164b24; background: var(--added); text-decoration: none; }
       .diff .remove, .diff del { display: block; color: #7a1b29; background: var(--removed); text-decoration: none; }
       .diff .hunk { color: var(--accent); } .file-tree { white-space: pre; }
+      .ftree { border: 1px solid var(--line); background: var(--surface); padding: 10px 12px; font-size: .87rem; }
+      .ftree .nested { margin-left: 16px; padding-left: 12px; border-left: 1px dashed var(--line); }
+      .ftree .fname-dir { margin: 6px 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 700; }
+      .ftree .frow { display: flex; align-items: baseline; gap: 10px; padding: 3px 6px; margin: 1px 0; }
+      .ftree .frow .fname { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 400; font-size: .95em; flex: none; text-decoration: none; font-style: normal; }
+      .ftree .frow .note { flex: 1; min-width: 0; color: var(--muted); font-size: .88em; }
+      .ftree .frow.ctx .fname { color: var(--muted); }
+      .ftree .frow.add .fname { color: #1a7d3a; }
+      .ftree .frow.mod .fname { color: #a36a00; font-style: italic; }
+      .ftree .frow.del .fname { color: #b3261e; }
       figure { margin: 20px 0 0; border: 1px solid var(--line); background: var(--surface); }
       .diagram-frame { max-width: 100%; overflow: auto; padding: 16px; background: var(--code); }
       .diagram-frame svg { display: block; width: 100%; min-width: 580px; height: auto; }
@@ -99,6 +139,24 @@
       </section>
 
       <section>
+        <p class="eyebrow">Procedure</p><h2>{{Fixed multi-step procedure title}}</h2>
+        <!-- Use for a fixed algorithm, pipeline, or lookup/decision procedure past four or five steps, or where
+             steps mix ordered actions with guardrails or exclusions. Open only the step a first-time reader
+             needs by default; keep the rest collapsed. Remove entirely for a short or single-path explanation
+             and use an ordinary numbered list instead. -->
+        <div class="steps">
+          <details open>
+            <summary><span class="step-num">1</span> {{Step outcome}} <span class="step-outcome">{{One-line detail}}</span><span class="chevron">&#9656;</span></summary>
+            <div class="step-body"><p>{{Full step explanation, source-supported.}}</p></div>
+          </details>
+          <details>
+            <summary><span class="step-num">2</span> {{Step outcome}} <span class="step-outcome">{{One-line detail}}</span><span class="chevron">&#9656;</span></summary>
+            <div class="step-body"><p>{{Full step explanation, source-supported.}}</p></div>
+          </details>
+        </div>
+      </section>
+
+      <section>
         <p class="eyebrow">Code</p><h2>{{Code example title}}</h2>
         <p class="code-label">{{language}} · {{optional file path}}</p>
         <pre><code class="language-ts"><span class="tok-keyword">export</span> <span class="tok-keyword">function</span> <span class="tok-function">example</span>(<span class="tok-property">name</span>: <span class="tok-type">string</span>) {
@@ -117,6 +175,7 @@
 
       <section>
         <p class="eyebrow">Structure</p><h2>{{File structure title}}</h2>
+        <!-- Plain tree: use when no path has a per-file change status to show. -->
         <pre class="file-tree"><code>{{root}}/
 ├── {{directory}}/
 │   └── {{file}}
@@ -124,11 +183,55 @@
       </section>
 
       <section>
-        <p class="eyebrow">Data</p><h2>{{Schema or structured facts}}</h2>
+        <p class="eyebrow">Structure</p><h2>{{Changed files title}}</h2>
+        <!-- Status tree: use when the tree must show which files were added, changed, or removed.
+             Folder names stay bold; file names are regular weight. Status is a semantic tag
+             (ins/del/italic) plus color, never color alone, and never a badge or per-folder count.
+             Give each changed/added/removed file a one-line reason, not a line-count delta. -->
+        <div class="ftree">
+          <div class="fname-dir">{{directory}}/</div>
+          <div class="nested">
+            <div class="frow add"><ins class="fname">{{added_file}}</ins><span class="note">{{Why it was added}}</span></div>
+            <div class="frow mod"><span class="fname">{{changed_file}}</span><span class="note">{{What changed}}</span></div>
+            <div class="frow del"><del class="fname">{{removed_file}}</del><span class="note">{{Why it was removed}}</span></div>
+            <div class="frow ctx"><span class="fname">{{unchanged_file}}</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <p class="eyebrow">Database schema</p><h2>{{Schema title}}</h2>
+        <!-- One card per table/entity. Use dtype-* for the column's data-type category (string,
+             number, boolean, date, uuid, json, ...) and key-badge only for keys/uniqueness the
+             source actually states. Remove a card's rows or the whole pattern for a single,
+             short entity and use one plain table instead. -->
+        <div class="schema-grid">
+          <article class="scard">
+            <header><h3>{{table_name}}</h3><p>{{One-line purpose}}</p></header>
+            <table>
+              <thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Null</th><th scope="col">Key</th></tr></thead>
+              <tbody>
+                <tr><td class="fieldname">{{id}}</td><td><span class="dtype dtype-uuid">{{uuid}}</span></td><td>not null</td><td><span class="key-badge pk">PK</span></td></tr>
+                <tr><td class="fieldname">{{field}}</td><td><span class="dtype dtype-string">{{text}}</span></td><td>{{nullable}}</td><td></td></tr>
+              </tbody>
+            </table>
+          </article>
+          <article class="scard">
+            <header><h3>{{other_table_name}}</h3><p>{{One-line purpose}}</p></header>
+            <table>
+              <thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Null</th><th scope="col">Key</th></tr></thead>
+              <tbody>
+                <tr><td class="fieldname">{{id}}</td><td><span class="dtype dtype-uuid">{{uuid}}</span></td><td>not null</td><td><span class="key-badge pk">PK</span></td></tr>
+                <tr><td class="fieldname">{{other_table_name}}_id</td><td><span class="dtype dtype-uuid">{{uuid}}</span></td><td>not null</td><td><span class="key-badge fk">FK</span></td></tr>
+              </tbody>
+            </table>
+          </article>
+        </div>
+
+        <p class="eyebrow" style="margin-top: 20px;">Relationships</p>
         <div class="table-wrap"><table>
-          <caption>{{Entity, relationship, or table purpose}}</caption>
-          <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Null</th><th scope="col">Constraints / notes</th></tr></thead>
-          <tbody><tr><td><code>{{field}}</code></td><td>{{type}}</td><td>{{yes/no}}</td><td>{{PK, FK, index, or source-supported note}}</td></tr></tbody>
+          <thead><tr><th scope="col">From</th><th scope="col">To</th><th scope="col">Cardinality</th></tr></thead>
+          <tbody><tr><td><code>{{child.fk_column}}</code></td><td><code>{{parent.pk_column}}</code></td><td>{{e.g. many rows → one row}}</td></tr></tbody>
         </table></div>
       </section>
 
