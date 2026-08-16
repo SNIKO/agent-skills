@@ -4,21 +4,6 @@ description: "Create and progressively deepen a single evolving specification do
 disable-model-invocation: true
 ---
 
-# Pipeline
-
-`swe-shape` → `swe-spec` → [`swe-plan`] → [`swe-worktree`] → `swe-execute` → `swe-review`, with `swe-research` available at any point.
-
-Each stage runs in its own session: the user invokes one skill, reviews the artifact, clears the context, then invokes the next with the artifacts as input. Assume no memory of other stages beyond the files named below.
-
-- **This stage:** decide what actually changes, from overall structure down to exact contracts.
-- **Reads:** `brief.md` (the approved problem, acceptance criteria, and exclusions, written by `swe-shape`) and the shared research corpus.
-- **Writes:** `spec.html`, deepened one confirmed pass at a time across many sessions.
-- **Next:** the user runs `swe-plan` if delivery needs sequencing, otherwise `swe-execute`. Do not invoke either.
-
-# Purpose
-
-Maintain one `{SPEC_FILE}` per change that always reads like a properly written spec: top-down from the overall idea and architecture down to exact, implementable detail, organized by logical/domain area the way a human architect would lay it out. Depth is earned one user-confirmed step at a time and is never produced further ahead than requested. Every pass rewrites the section(s) it belongs to in place and the document is reshaped as needed so it always reads as freshly authored, never as a log of edits.
-
 # Inputs
 
 CHANGE_DIR - the directory for the current change, typically `.swe/<change>`, infer from the conversation if not explicitly named.
@@ -27,21 +12,37 @@ SPEC_FILE: `{CHANGE_DIR}/spec.html`
 MOCKUPS_DIR: `{CHANGE_DIR}/mockups/`
 RESEARCH_DIR: `.swe/research/` — shared across all changes, indexed by `INDEX.md`
 
-`{SPEC_FILE}` is canonical and is read directly by `swe-plan`, `swe-execute`, and `swe-review`. There is no Markdown counterpart; do not create one.
+# Purpose
+
+This `swe-spec` stage is part of the SDLC pipeline for a single change, following the path:
+
+`swe-shape` → `swe-spec` → [`swe-plan`] → [`swe-worktree`] → `swe-execute` → `swe-review`, with `swe-research` available at any point.
+
+Maintain one `{SPEC_FILE}` per change that always reads like a properly written spec: top-down from the overall idea down to exact, implementable detail, organized by logical/domain area the way a human architect would lay it out, and never bigger than the change actually warrants. Depth is earned one user-confirmed step at a time and is never produced further ahead than requested. Every pass rewrites the section(s) it belongs to in place and the document is reshaped as needed so it always reads as freshly authored, never as a log of edits.
+
+# Engineering Stance
+
+You and the user are peer engineers on this document; neither outranks the other, and being asked for something is not authorization to write it down unexamined.
+
+- Evaluate every request against `Design Principles`, the brief, repository conventions, and any evidence already gathered before it goes into the document.
+- When a request would produce an unsound, insecure, inconsistent, or unmaintainable design, or conflicts with evidence already gathered, say so plainly in the same pass: state the concern, the reasoning or evidence behind it, and the alternative you'd recommend. Do not silently comply, and do not bury the objection as a footnote.
+- Raise it once, with your reasoning. Do not repeat an objection the user has already heard and decided on, and do not withhold the requested content while waiting for agreement.
+- The user has the final call. Once they've heard the concern and confirm a direction, write the spec to that direction, record the decision and its rationale where a future reader needs it (a callout, not a silent overwrite of your objection), and move on without relitigating it.
+- This does not license inventing scope, second-guessing an already-settled brief decision (`Brief Revision Rule` still governs infeasibility), or turning `Ask only what's blocking`'s narrow question budget into open-ended debate.
 
 # Tools & Skills
 
-[html-artifacts](../html-artifacts/SKILL.md) - use for the visual and structural style rules (semantic HTML, diagrams, tables, code blocks) when writing or rewriting `{SPEC_FILE}`. Its own workflow assumes generating a document from scratch; here it supplies style rules only — the editing itself follows the workflow below, which edits `{SPEC_FILE}` directly and never regenerates it wholesale.
+`html-artifacts` skill - use for the visual and structural style rules (semantic HTML, diagrams, tables, code blocks, etc.) when writing or rewriting `{SPEC_FILE}`.
 
 # Workflow
 
 1. **Orient.** Read `{BRIEF_FILE}`, the research reports it links, the full current `{SPEC_FILE}` if it exists, and repository context relevant to the requested area. Identify the document's current section layout and how deep each section currently goes.
 2. **Resolve shape and depth.** Apply `Document Shape` and `Depth Progression` to determine which section(s) the request touches and the next level of detail for each.
-3. **Ask only what's blocking.** Ask the smallest set of questions where two or more options have genuinely different tradeoffs at the depth now being written. Do not ask about decisions the repository, the brief, or a shallower pass already settled. Offer concrete options with a recommendation when one exists.
+3. **Challenge, then ask only what's blocking.** Apply `Engineering Stance` before writing anything the request implies: raise a concern once if evidence or `Design Principles` disagree with it, then ask the smallest set of questions where two or more options have genuinely different tradeoffs at the depth now being written. Do not ask about decisions the repository, the brief, or a shallower pass already settled. Offer concrete options with a recommendation when one exists.
 4. **Delegate unresolved facts.** Where a decision at this depth depends on an unknown repository fact, external behavior, or dependency capability, follow `Research Delegation` before designing that part.
 5. **Design the content.** Apply `Design Principles` and decide what a reviewer actually needs to see at this depth: an early pass on a component might need only its responsibility and its contracts with neighbors; a later pass needs its exact interface, states, and error behavior. Choose whatever headings communicate the current decision well. Keep the whole change in mind — do not propose a solution that another section's already-settled constraints would make unworkable, unless that constraint can still change, in which case say so in both places.
 6. **Rewrite in place, then reshape.** Update the owning section(s) directly with the new pass — never append a new section or pass to the end of the document. Then review the entire document and merge, split, rename, or reorder sections wherever it now reads better, including sections this request did not touch. Reshaping is for readability and organization; when it would require *reversing a decision*, apply `Contradiction Rule` instead.
-7. **Verify coherence and structure.** Read the reshaped document top-to-bottom and confirm it moves from overall idea to exact detail with no gaps, no orphaned cross-references, and no trace of the previous structure. Then apply `Document Mechanics`: valid well-formed HTML, every section carries a stable `id`, and the table of contents matches the sections.
+7. **Verify coherence and structure.** Read the reshaped document top-to-bottom and confirm it moves from overall idea to exact detail with no gaps, no orphaned cross-references, and no trace of the previous structure. Then apply `Document Mechanics`: valid well-formed HTML and every section carries a stable `id`.
 8. **Report.** Follow `Output`.
 
 # Document Shape
@@ -50,9 +51,9 @@ A change's spec is organized the way a competent architect would organize any sp
 
 Three things guide the shape regardless of what sections exist:
 
-- **Top-down layering.** The document reads from the overall idea and how the pieces fit together, down to exact, implementable contracts. An overview/approach statement and, when there is more than one moving part, an architecture or integration view (e.g. a component/contract diagram) come before the sections that go into any one part in detail. A section for one logical area never appears before the material it depends on.
+- **Top-down layering.** The document reads from the overall idea and how the pieces fit together, down to exact, implementable contracts. Every spec opens with a short statement of the idea — for a small, single-artifact change this can be the same sentence that states what doesn't fit and why, not a separate section. When there is more than one moving part, an architecture or integration view (e.g. a component/contract diagram) comes before the sections that go into any one part in detail. A section for one logical area never appears before the material it depends on.
 - **Domain-logical grouping.** Sections are organized by logical or domain area — the kind of grouping a reader would look for when reviewing that part of the design — not by when the content was written or which conversation produced it. A section born from "let's detail the API" belongs with any other API material already in the document, even if that material was written in an earlier session under a different heading.
-- **Addressability.** The document is read by downstream agents that must not load all of it. Every section is a `<section id="...">` with a stable, meaningful id, and the document opens with a table of contents listing those ids and one line on what each covers. A downstream stage reads the contents, then only the sections it needs.
+- **Addressability.** The document is read by downstream agents that must not load all of it. Every section is a `<section id="...">` with a stable, meaningful id; that id is enough for a downstream stage to read the section it needs directly, so the document does not open with a rendered table of contents.
 
 User-facing changes may link mockups or wireframes; keep those as separate files in `{MOCKUPS_DIR}` and link them from the owning section rather than inlining them.
 
@@ -62,7 +63,7 @@ Depth is how exact the current pass is for whatever section(s) are in play, rang
 
 Determine the depth for the current request as follows:
 
-- **No area or depth stated, document does not exist yet:** determine shape and depth from the change itself. If the change is small, produce the whole spec at its final, exact depth in one pass. If larger, produce the shallowest useful pass across the whole document first — the overall idea or approach, top-level components/responsibilities and how they integrate, headline API operations or user-facing entry points if applicable, and a UI mockup or wireframe if user-facing. Keep it one reviewable pass, not an exhaustive one.
+- **No area or depth stated, document does not exist yet:** determine shape and depth from the change itself. A change is small when it lands inside one owned artifact — one table, one store, one interface, one module — and does not add a new cross-component pipeline stage, a new external contract, or a new failure boundary; it stays small even when it touches many fields or columns. For a small change, write the whole spec at its final, exact depth in one pass, shaped around what actually changed: current state, why it doesn't fit, the target contract, and the diff between them. Do not add an Approach section, an architecture/integration view, a multi-stage processing lifecycle, a repository-impact list, or a verification-strategy section the change does not need — one or two sections following the `DB`/`Code` diff framing below is a complete spec for this case. If the change is genuinely larger — it spans multiple components that each warrant their own review pass, or introduces a pipeline or contract that did not exist before — produce the shallowest useful pass across the whole document first: the overall idea or approach, top-level components/responsibilities and how they integrate, headline API operations or user-facing entry points if applicable, and a UI mockup or wireframe if user-facing. Keep it one reviewable pass, not an exhaustive one.
 - **Area and/or depth stated explicitly** (e.g. "just the API", "design the database tables", "high level only"): honor the requested area and go straight to the requested depth for it, even if that skips passes that would normally come first. Still add a brief entry at each shallower depth for that area if none exists, so the document stays readable top-down — a short statement, not a placeholder.
 - **User asks to go deeper, get more detail, or approves and asks to continue:** advance the section just discussed (or named) exactly one pass further than what already exists there. Never skip ahead to a deeper pass than requested, and never silently deepen a section the user did not ask about.
 - **A section already has content and the user gives feedback without asking to go deeper:** treat it as a revision at its current depth, not an advance.
@@ -73,8 +74,34 @@ At every depth, regardless of section: do not specify private methods, internal 
 
 - **Stable ids.** Each section keeps its `id` across passes; downstream artifacts and `plan.md` link to them. When a reshape genuinely renames a section, update every reference to it in the same pass.
 - **Well-formedness.** After every edit, verify the document parses: no unclosed or orphaned tags, no duplicated ids, no broken local links. In-place editing of nested markup is the main mechanical failure mode of this skill — check rather than assume.
-- **Shallow nesting.** Prefer flat `<section>` elements with headings over deeply nested wrappers. Deep structure is what makes surgical edits go wrong.
-- **Split threshold.** A single file is the default. Once the document exceeds roughly 1500 lines or several areas have independently reached exact-contract depth, split by domain area into `spec-<area>.html` and reduce `{SPEC_FILE}` to the overview, the architecture view, and the table of contents linking each area file. The document stays logically one spec; only its storage changes.
+- **Split threshold.** A single file is the default. Once the document exceeds roughly 1500 lines or several areas have independently reached exact-contract depth, split by domain area into `spec-<area>.html` and reduce `{SPEC_FILE}` to the overview, the architecture view if one exists, and a linked index of each area file. The document stays logically one spec; only its storage changes.
+
+# Document Content
+
+## General
+
+- Avoid long prose paragraphs; use short paragraphs, bullet lists, and tables to make the spec easy to read and scan.
+- If it is easier to explain in code than in prose or table and the code is expected to be presented in next spec depth disclosure anyways, then show the code
+- Do not use tables with multiple multiline columns
+- Do not add table of contents 
+
+## Diagrams
+
+- Use different colors, shapes, or line styles to distinguish different kinds of components, data, or flows.
+- Make it clear visually which components are existing ones and which are new or changed.
+
+## UI
+
+- Mockups, wireframes, or screenshots of the current and proposed UI.
+
+## DB
+
+- Show the existing schema next to the proposed schema: table and column names, types, constraints, and relationships.
+- Show the difference — what is added, changed, or removed — not just the final schema.
+
+## Code
+
+- Show diffs when existing abstractions are being changed.
 
 # Design Principles
 
@@ -83,17 +110,13 @@ At every depth, regardless of section: do not specify private methods, internal 
 - Use repository-specific design/coding rules and conventions, mixed with the general principles below. In case of conflict, use the repository's rules.
 - Design boundaries and contracts so local implementation defects are contained and cannot violate system-wide invariants, public contracts, data integrity, security boundaries, or integration guarantees.
 - Prefer clear ownership of data, side effects, lifecycle transitions, and cross-module contracts. Every cross-module contract has a clear owner responsible for compatibility and change coordination.
-- Do not expose internal domain models directly across boundaries when that would create unwanted coupling.
 - A contract is only complete once it gives the implementer every input, dependency, and signal their component needs.
-- Keep dependencies directional and avoid circular dependencies.
 - Minimize shared mutable state; make ownership and mutation rules explicit where shared state is unavoidable.
 - Isolate external I/O behind explicit clients, adapters, ports, or integration boundaries.
-- Make failure modes, retries, idempotency, ordering, consistency, and observability explicit where relevant.
 - Prefer the simplest structure that satisfies current requirements. Avoid abstractions without a current consumer, known variation point, or concrete maintenance problem. Avoid over-modularizing: a small cohesive file does not need to be split.
+- When the brief describes evolving something that already exists, modify that table, store, or module in place. Only introduce a new one when the existing artifact cannot satisfy the target contract even after modification, and state why in the section that introduces it — do not split one artifact into two, or add a new pipeline stage, to make room for a bigger document.
 - Prefer tasks that deliver observable value or a stable dependency boundary over tasks that are technically convenient to implement. Do not create a task solely to introduce a stub, placeholder, or empty interface immediately overwritten by the next task.
 - Test code belongs in the same task as the production code it tests, unless the tests require infrastructure introduced by a later task.
-- Do not invent file paths, symbols, commands, APIs, or conventions without marking them `(assumed)`.
-- Include migrations, configuration, observability, feature flags, and rollback concerns in the task that requires them for safe completion.
 
 # Research Delegation
 
@@ -131,26 +154,23 @@ Ask first when an investigation is authenticated, paid, mutating, or expensive.
 
 Never modify source code, and never invoke another SWE pipeline stage.
 
-# Constraints
-
-- Do not deepen a section further than the user asked for in this request.
-- Do not produce a Markdown counterpart to `{SPEC_FILE}`.
-
 # Output
 
 After writing or updating `{SPEC_FILE}`, report:
 
 - which section(s) were added, rewritten, merged, split, or reordered, and why;
 - the current depth reached per section, and which sections are exact-contract complete;
-- any confirmed decision this pass challenged, and how it was resolved;
+- any engineering concern raised or confirmed decision this pass challenged, and how the user resolved it;
 - research created or reused;
 - the artifact path, `{SPEC_FILE}`;
 - what the user can ask for next (approve, revise this depth, or go deeper on a named section), and whether enough sections are contract-complete to move to delivery.
 
 # Completion Criteria
 
-- `{SPEC_FILE}` reads top-to-bottom as a coherent, freshly-written spec: overall idea and architecture first, exact contracts last, grouped by logical/domain area throughout.
+- `{SPEC_FILE}` reads top-to-bottom as a coherent, freshly-written spec: overall idea first, exact contracts last, grouped by logical/domain area throughout.
 - Every section's content stops exactly at the depth the user has confirmed or explicitly requested — no further, no less.
 - No section, once superseded by a deeper pass or a reshape, still exists in its earlier form elsewhere in the document.
 - No unresolved design decision blocks the depth just written; genuine tradeoffs were asked about instead of guessed.
-- `Document Mechanics` holds: the document is well-formed, ids are stable, and the table of contents matches the sections.
+- Any request that conflicted with `Design Principles`, the brief, or gathered evidence was raised once with reasoning before being written in, and the final content reflects the user's decision either way.
+- The document's length and section count are proportional to the scope of the underlying change: a single-artifact modification (one table, one store, one interface) is never expanded into a multi-subsystem redesign, extra pipeline stages, or a verification-strategy grid it does not need.
+- `Document Mechanics` holds: the document is well-formed and ids are stable; no section relies on a rendered table of contents to be found.
